@@ -1,0 +1,84 @@
+1) Configurar entorno inicial
+	- Crear repositorio con .gitignore (node_modules, .env, etc).
+	- Configurar devcontainers para desarrollo.
+	- Configurar Dockerfile + docker-compose para frontend y backend.
+	- Crear estructura base de frontend (React + Redux) y backend (Node + Express).
+	- Configurar variables de entorno (.env) con buenas prácticas.
+
+2) Configurar base del backend
+
+	- Conectar a MongoDB (contenedor MongoDB en docker-compose).
+	- Crear modelos iniciales: Usuario (con roles), Oficina, Reporte, Chat/Mensaje.
+	- Implementar autenticación con JWT (login, register, refresh tokens).
+	- Crear middleware de autenticación y autorización.
+	- Crear rutas protegidas según roles (RBAC).
+	- Configurar CORS y seguridad básica (helmet, rate limiting).
+
+3) Configurar base del frontend
+
+	- Crear estructura de vistas y routing (React Router con rutas protegidas).
+	- Implementar login y almacenamiento seguro del JWT (httpOnly cookies o localStorage con consideraciones de seguridad).
+	- Configurar Redux para gestión de estado global (usuario, tokens, reportes).
+	- Crear layout responsive (mobile-first) con navegación adaptativa.
+	- Configurar axios/fetch con interceptores para JWT.
+
+4) Implementar perfiles de usuario
+
+	- Usuario estándar: formulario de reporte, gestión de perfil (datos personales, preferencias, oficina/workstation preferida).
+	- Service desk: vista de tickets (dashboard), actualización de estados, asignación de tickets.
+	- Admin: gestión de usuarios (CRUD), gestión de oficinas (CRUD), dashboard con métricas y reportes estadísticos.
+
+5) Reportes
+
+	- Añadir geolocalización (HTML5 Geolocation API).
+	- Subida de imágenes/videos (multer en backend, preview en frontend).
+	- Integrar API de análisis de imágenes (Pollinations.ai / Google Vision / Azure AI Vision).
+	- Implementar reconocimiento de objetos y etiquetado automático.
+	- Guardar metadatos: etiquetas, datos de análisis, ubicación, timestamp.
+	- Validación de tipos de archivo y tamaño máximo.
+
+6) Historial y estados del ticket
+
+	- Listas separadas: abiertos / cerrados.
+	- Filtros por estado (open, assigned, in-progress, closed).
+	- Búsqueda y ordenación de tickets.
+	- Detalle del reporte con toda la información e historial de cambios.
+	- Sistema de notificaciones para cambios de estado.
+
+7) Funcionalidades adicionales
+
+	- Chat en tiempo real entre usuario y service desk (Socket.io o similar).
+	- Compartir reportes por email (Nodemailer o servicio de email).
+	- Modo oscuro (CSS variables, localStorage para preferencias).
+	- Progressive Web App (PWA): service worker, manifest.json, modo offline.
+	- Accesibilidad WCAG AA (roles ARIA, navegación por teclado, contraste, alt text).
+	- Internacionalización (i18n) opcional pero recomendada.
+
+8) Optimización y seguridad
+
+	- Validación de formularios (frontend: react-hook-form/formik, backend: express-validator/joi).
+	- Protección de rutas en backend (middleware) y frontend (PrivateRoute).
+	- Manejo seguro de tokens (httpOnly cookies recomendado, no localStorage para tokens sensibles).
+	- Almacenamiento seguro de credenciales (.env, nunca en código).
+	- Sanitización de inputs para prevenir XSS y SQL/NoSQL injection.
+	- Implementar HTTPS en producción.
+	- Rate limiting para prevenir ataques de fuerza bruta.
+
+9) Testing básico
+
+	- Comprobar APIs (Postman/Thunder Client, o Jest para tests unitarios).
+	- Pruebas de integración en backend.
+	- Pruebas de UI (React Testing Library, Cypress opcional).
+	- Validar flujos completos de usuario.
+	- Verificar todos los roles y permisos.
+
+10) Entrega final
+
+	- Revisión completa de Docker (Dockerfile optimizado, docker-compose funcional).
+	- Documentación completa: README.md con instrucciones de instalación y uso.
+	- Documentación de API (Swagger/OpenAPI recomendado).
+	- Variables de entorno de ejemplo (.env.example).
+	- Scripts de inicialización (seed data para usuarios iniciales).
+	- Demo funcional con datos de prueba.
+	- Video/presentación demostrando todas las funcionalidades.
+	- Verificar que cumple todos los requisitos del proyecto.

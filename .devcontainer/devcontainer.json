@@ -1,0 +1,82 @@
+{
+  "name": "Service Desk App Development",
+  "dockerComposeFile": "docker-compose.dev.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+
+  // Configure tool-specific properties
+  "customizations": {
+    "vscode": {
+      // Extensions to install in the container
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-azuretools.vscode-docker",
+        "mongodb.mongodb-vscode",
+        "dsznajder.es7-react-js-snippets",
+        "bradlc.vscode-tailwindcss",
+        "usernamehw.errorlens",
+        "formulahendry.auto-rename-tag",
+        "christian-kohler.path-intellisense",
+        "wix.vscode-import-cost",
+        "ms-vscode.vscode-typescript-next"
+      ],
+      // Settings for VS Code
+      "settings": {
+        "terminal.integrated.shell.linux": "/bin/zsh",
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "eslint.validate": [
+          "javascript",
+          "javascriptreact",
+          "typescript",
+          "typescriptreact"
+        ]
+      }
+    }
+  },
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally
+  "forwardPorts": [
+    3000,  // Frontend (React)
+    5000,  // Backend (Express)
+    27017  // MongoDB
+  ],
+
+  // Port labels
+  "portsAttributes": {
+    "3000": {
+      "label": "Frontend",
+      "onAutoForward": "notify"
+    },
+    "5000": {
+      "label": "Backend API",
+      "onAutoForward": "notify"
+    },
+    "27017": {
+      "label": "MongoDB",
+      "onAutoForward": "silent"
+    }
+  },
+
+  // Commands to run after container creation
+  "postCreateCommand": "echo 'DevContainer ready! Run npm install in backend and frontend folders.'",
+
+  // Comment out to connect as root instead
+  "remoteUser": "node",
+
+  // Keep container running even after VS Code closes
+  "shutdownAction": "stopCompose",
+
+  // Features to add to the dev container
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  }
+}

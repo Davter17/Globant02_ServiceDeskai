@@ -1,0 +1,129 @@
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  animation: fadeIn 1s ease-in;
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin-top: 0;
+}
+
+h3 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+}
+
+h4 {
+  font-size: 1rem;
+  margin: 0.5rem 0;
+  color: #667eea;
+}
+
+.status-card, .info-card {
+  background: white;
+  color: #333;
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 1rem 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 600px;
+  width: 100%;
+  animation: slideUp 0.5s ease-out;
+}
+
+.status-ok {
+  color: #10b981;
+  font-weight: bold;
+}
+
+.status-error {
+  color: #ef4444;
+  font-weight: bold;
+}
+
+ul {
+  text-align: left;
+  list-style-position: inside;
+  line-height: 1.8;
+}
+
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.tech-grid > div {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.tech-grid p {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+}
+
+.next-step {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  margin-top: 2rem;
+  font-size: 1rem;
+  backdrop-filter: blur(10px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+  
+  .status-card, .info-card {
+    padding: 1.5rem;
+  }
+  
+  .tech-grid {
+    grid-template-columns: 1fr;
+  }
+}
