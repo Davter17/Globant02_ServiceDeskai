@@ -19,6 +19,24 @@ Bienvenido a la documentación del proyecto Service Desk para Globant Piscine.
   Estado actual de implementación, pasos completados y pendientes.  
   Actualizado después de cada fase importante.
 
+### 🛠️ Implementación Técnica
+
+#### Backend - Paso 2
+- **[Step 2.1: Conexión MongoDB](./STEP_2.1_MONGODB_CONNECTION.md)**  
+  Configuración de Mongoose, retry logic y health checks.
+  
+- **[Step 2.2: Modelos de Datos](./STEP_2.2_MODELS.md)**  
+  Documentación completa de User, Office, Report y Message models.
+  
+- **[Step 2.3: Autenticación JWT](./STEP_2.3_JWT_AUTHENTICATION.md)**  
+  Sistema completo de autenticación con JWT (registro, login, refresh tokens).
+
+- **[Step 2.4: Rutas Protegidas con RBAC](./STEP_2.4_RBAC_ROUTES.md)**  
+  Control de acceso basado en roles con 31 endpoints API funcionales.
+
+- **[Step 2.5: CORS y Seguridad Básica](./STEP_2.5_SECURITY.md)** ✨ NUEVO  
+  Implementación completa de seguridad: Helmet, Rate Limiting, Sanitización XSS/NoSQL.
+
 ---
 
 ## 🗺️ Navegación Rápida

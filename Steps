@@ -1,18 +1,18 @@
-1) Configurar entorno inicial
-	- Crear repositorio con .gitignore (node_modules, .env, etc).
-	- Configurar devcontainers para desarrollo.
-	- Configurar Dockerfile + docker-compose para frontend y backend.
-	- Crear estructura base de frontend (React + Redux) y backend (Node + Express).
-	- Configurar variables de entorno (.env) con buenas prácticas.
+1) Configurar entorno inicial ✅ COMPLETADO
+	✅ Crear repositorio con .gitignore (node_modules, .env, etc).
+	✅ Configurar devcontainers para desarrollo.
+	✅ Configurar Dockerfile + docker-compose para frontend y backend.
+	✅ Crear estructura base de frontend (React + Redux) y backend (Node + Express).
+	✅ Configurar variables de entorno (.env) con buenas prácticas.
 
-2) Configurar base del backend
+2) Configurar base del backend ✅ COMPLETADO
 
-	- Conectar a MongoDB (contenedor MongoDB en docker-compose).
-	- Crear modelos iniciales: Usuario (con roles), Oficina, Reporte, Chat/Mensaje.
-	- Implementar autenticación con JWT (login, register, refresh tokens).
-	- Crear middleware de autenticación y autorización.
-	- Crear rutas protegidas según roles (RBAC).
-	- Configurar CORS y seguridad básica (helmet, rate limiting).
+	✅ Conectar a MongoDB (contenedor MongoDB en docker-compose).
+	✅ Crear modelos iniciales: Usuario (con roles), Oficina, Reporte, Chat/Mensaje.
+	✅ Implementar autenticación con JWT (login, register, refresh tokens).
+	✅ Crear middleware de autenticación y autorización.
+	✅ Crear rutas protegidas según roles (RBAC).
+	✅ Configurar CORS y seguridad básica (helmet, rate limiting).
 
 3) Configurar base del frontend
 
