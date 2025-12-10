@@ -8,6 +8,13 @@ import Home from '../pages/Home';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import Dashboard from '../pages/Dashboard';
+import Profile from '../pages/Profile';
+import ReportForm from '../pages/ReportForm';
+import ReportList from '../pages/ReportList';
+import TicketsDashboard from '../pages/TicketsDashboard';
+import UserManagement from '../pages/UserManagement';
+import OfficeManagement from '../pages/OfficeManagement';
+import AdminDashboard from '../pages/AdminDashboard';
 import Unauthorized from '../pages/Unauthorized';
 import NotFound from '../pages/NotFound';
 
@@ -54,7 +61,7 @@ const AppRoutes = () => {
         path="/reports"
         element={
           <PrivateRoute roles={['user']}>
-            <div>Mis Reportes (Pendiente - Paso 4)</div>
+            <ReportList />
           </PrivateRoute>
         }
       />
@@ -63,7 +70,7 @@ const AppRoutes = () => {
         path="/reports/new"
         element={
           <PrivateRoute roles={['user']}>
-            <div>Nuevo Reporte (Pendiente - Paso 5)</div>
+            <ReportForm />
           </PrivateRoute>
         }
       />
@@ -73,7 +80,7 @@ const AppRoutes = () => {
         path="/tickets"
         element={
           <PrivateRoute roles={['servicedesk', 'admin']}>
-            <div>Gestión de Tickets (Pendiente - Paso 4)</div>
+            <TicketsDashboard />
           </PrivateRoute>
         }
       />
@@ -92,7 +99,7 @@ const AppRoutes = () => {
         path="/admin/users"
         element={
           <PrivateRoute roles={['admin']}>
-            <div>Gestión de Usuarios (Pendiente - Paso 4)</div>
+            <UserManagement />
           </PrivateRoute>
         }
       />
@@ -101,7 +108,7 @@ const AppRoutes = () => {
         path="/admin/offices"
         element={
           <PrivateRoute roles={['admin']}>
-            <div>Gestión de Oficinas (Pendiente - Paso 4)</div>
+            <OfficeManagement />
           </PrivateRoute>
         }
       />
@@ -119,7 +126,7 @@ const AppRoutes = () => {
         path="/admin/analytics"
         element={
           <PrivateRoute roles={['admin']}>
-            <div>Analytics (Pendiente - Paso 4)</div>
+            <AdminDashboard />
           </PrivateRoute>
         }
       />
@@ -129,7 +136,7 @@ const AppRoutes = () => {
         path="/profile"
         element={
           <PrivateRoute>
-            <div>Mi Perfil (Pendiente - Paso 4)</div>
+            <Profile />
           </PrivateRoute>
         }
       />

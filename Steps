@@ -22,20 +22,20 @@
 	✅ Crear layout responsive (mobile-first) con navegación adaptativa.
 	✅ Configurar axios/fetch con interceptores para JWT.
 
-4) Implementar perfiles de usuario
+4) Implementar perfiles de usuario ✅ COMPLETADO
 
-	- Usuario estándar: formulario de reporte, gestión de perfil (datos personales, preferencias, oficina/workstation preferida).
-	- Service desk: vista de tickets (dashboard), actualización de estados, asignación de tickets.
-	- Admin: gestión de usuarios (CRUD), gestión de oficinas (CRUD), dashboard con métricas y reportes estadísticos.
+	✅ Usuario estándar: formulario de reporte, gestión de perfil (datos personales, preferencias, oficina/workstation preferida).
+	✅ Service desk: vista de tickets (dashboard), actualización de estados, asignación de tickets.
+	✅ Admin: gestión de usuarios (CRUD), gestión de oficinas (CRUD), dashboard con métricas y reportes estadísticos.
 
-5) Reportes
+5) Reportes ✅ COMPLETADO
 
-	- Añadir geolocalización (HTML5 Geolocation API).
-	- Subida de imágenes/videos (multer en backend, preview en frontend).
-	- Integrar API de análisis de imágenes (Pollinations.ai / Google Vision / Azure AI Vision).
-	- Implementar reconocimiento de objetos y etiquetado automático.
-	- Guardar metadatos: etiquetas, datos de análisis, ubicación, timestamp.
-	- Validación de tipos de archivo y tamaño máximo.
+	✅ Añadir geolocalización (HTML5 Geolocation API).
+	✅ Subida de imágenes/videos (multer en backend, preview en frontend).
+	✅ Integrar API de análisis de imágenes (Pollinations.ai / Google Vision / Azure AI Vision).
+	✅ Implementar reconocimiento de objetos y etiquetado automático.
+	✅ Guardar metadatos: etiquetas, datos de análisis, ubicación, timestamp.
+	✅ Validación de tipos de archivo y tamaño máximo.
 
 6) Historial y estados del ticket
 

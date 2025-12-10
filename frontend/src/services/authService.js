@@ -48,6 +48,12 @@ const authService = {
     return response.data.user;
   },
 
+  // Update profile
+  updateProfile: async (profileData) => {
+    const response = await api.put('/auth/profile', profileData);
+    return response.data.user;
+  },
+
   // Refresh token
   refreshToken: async () => {
     const refreshToken = localStorage.getItem('refreshToken');
