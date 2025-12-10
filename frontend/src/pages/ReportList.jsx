@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import NotificationToast from '../components/NotificationToast';
+import { useNotification } from '../utils/useNotification';
 import '../styles/ReportList.css';
 
 const ReportList = () => {
   const [reports, setReports] = useState([]);
+  const [filteredReports, setFilteredReports] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all'); // all, open, closed
+  const [filter, setFilter] = useState('all'); // all, open, assigned, in-progress, closed
+  const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [priorityFilter, setPriorityFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('newest'); // newest, oldest, priority-high, priority-low
+  const [dateRange, setDateRange] = useState({ start: '', end: '' });
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const { notification, showNotification, clearNotification } = useNotification();
 
   useEffect(() => {
     // TODO: Cargar reportes desde el backend
@@ -102,18 +113,139 @@ const ReportList = () => {
     return 'hace un momento';
   };
 
-  const filteredReports = reports.filter((report) => {
-    if (filter === 'all') return true;
-    if (filter === 'open') return report.status !== 'closed';
-    if (filter === 'closed') return report.status === 'closed';
-    return true;
-  });
+  // Aplicar filtros y búsqueda
+  useEffect(() => {
+    let result = [...reports];
+
+    // Filtro por estado
+    if (filter !== 'all') {
+      if (filter === 'open') {
+        result = result.filter(r => r.status === 'open');
+      } else if (filter === 'closed') {
+        result = result.filter(r => r.status === 'closed');
+      } else {
+        result = result.filter(r => r.status === filter);
+      }
+    }
+
+    // Búsqueda por texto
+    if (searchTerm) {
+      result = result.filter(r =>
+        r.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        r.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        r.location.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filtro por categoría
+    if (categoryFilter !== 'all') {
+      result = result.filter(r => r.category === categoryFilter);
+    }
+
+    // Filtro por prioridad
+    if (priorityFilter !== 'all') {
+      result = result.filter(r => r.priority === priorityFilter);
+    }
+
+    // Filtro por rango de fechas
+    if (dateRange.start) {
+      result = result.filter(r => new Date(r.createdAt) >= new Date(dateRange.start));
+    }
+    if (dateRange.end) {
+      result = result.filter(r => new Date(r.createdAt) <= new Date(dateRange.end));
+    }
+
+    // Ordenación
+    switch (sortBy) {
+      case 'newest':
+        result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        break;
+      case 'oldest':
+        result.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        break;
+      case 'priority-high':
+        const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
+        result.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+        break;
+      case 'priority-low':
+        const priorityOrderLow = { low: 0, medium: 1, high: 2, critical: 3 };
+        result.sort((a, b) => priorityOrderLow[a.priority] - priorityOrderLow[b.priority]);
+        break;
+      default:
+        break;
+    }
+
+    setFilteredReports(result);
+  }, [reports, filter, searchTerm, categoryFilter, priorityFilter, dateRange, sortBy]);
 
   const stats = {
     total: reports.length,
     open: reports.filter(r => r.status === 'open').length,
-    inProgress: reports.filter(r => r.status === 'in-progress' || r.status === 'assigned').length,
+    assigned: reports.filter(r => r.status === 'assigned').length,
+    inProgress: reports.filter(r => r.status === 'in-progress').length,
     closed: reports.filter(r => r.status === 'closed').length,
+  };
+
+  const handleReportClick = (report) => {
+    setSelectedReport(report);
+    setShowDetailModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowDetailModal(false);
+    setSelectedReport(null);
+  };
+
+  const clearFilters = () => {
+    setFilter('all');
+    setSearchTerm('');
+    setCategoryFilter('all');
+    setPriorityFilter('all');
+    setDateRange({ start: '', end: '' });
+    setSortBy('newest');
+  };
+
+  // Función para cambiar el estado de un reporte
+  const handleStatusChange = (reportId, newStatus) => {
+    const updatedReports = reports.map(report => {
+      if (report._id === reportId) {
+        const oldStatus = report.status;
+        
+        // Mostrar notificación según el cambio de estado
+        const statusMessages = {
+          'assigned': {
+            title: 'Reporte Asignado',
+            message: `El reporte "${report.title}" ha sido asignado a un técnico.`
+          },
+          'in-progress': {
+            title: 'En Progreso',
+            message: `El reporte "${report.title}" está siendo atendido.`
+          },
+          'closed': {
+            title: 'Reporte Cerrado',
+            message: `El reporte "${report.title}" ha sido resuelto exitosamente.`
+          },
+          'open': {
+            title: 'Reporte Reabierto',
+            message: `El reporte "${report.title}" ha sido reabierto.`
+          }
+        };
+
+        if (statusMessages[newStatus]) {
+          showNotification('success', statusMessages[newStatus].title, statusMessages[newStatus].message);
+        }
+
+        return { ...report, status: newStatus };
+      }
+      return report;
+    });
+
+    setReports(updatedReports);
+    
+    // Si el reporte está seleccionado en el modal, actualizar también
+    if (selectedReport && selectedReport._id === reportId) {
+      setSelectedReport({ ...selectedReport, status: newStatus });
+    }
   };
 
   if (loading) {
@@ -128,6 +260,8 @@ const ReportList = () => {
 
   return (
     <div className="report-list-container">
+      <NotificationToast notification={notification} onClose={clearNotification} />
+      
       <div className="report-list-header">
         <div>
           <h1>📋 Mis Reportes</h1>
@@ -155,6 +289,13 @@ const ReportList = () => {
           </div>
         </div>
         <div className="stat-card">
+          <div className="stat-icon">🎯</div>
+          <div className="stat-info">
+            <span className="stat-value">{stats.assigned}</span>
+            <span className="stat-label">Asignados</span>
+          </div>
+        </div>
+        <div className="stat-card">
           <div className="stat-icon">⏳</div>
           <div className="stat-info">
             <span className="stat-value">{stats.inProgress}</span>
@@ -170,7 +311,96 @@ const ReportList = () => {
         </div>
       </div>
 
-      {/* Filtros */}
+      {/* Barra de búsqueda y filtros avanzados */}
+      <div className="search-filter-section">
+        <div className="search-bar">
+          <span className="search-icon">🔍</span>
+          <input
+            type="text"
+            placeholder="Buscar por título, descripción o ubicación..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          {searchTerm && (
+            <button className="clear-search" onClick={() => setSearchTerm('')}>✕</button>
+          )}
+        </div>
+
+        <div className="filters-row">
+          <div className="filter-group">
+            <label>Estado:</label>
+            <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+              <option value="all">Todos</option>
+              <option value="open">Abiertos</option>
+              <option value="assigned">Asignados</option>
+              <option value="in-progress">En Progreso</option>
+              <option value="closed">Cerrados</option>
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label>Categoría:</label>
+            <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+              <option value="all">Todas</option>
+              <option value="Hardware">Hardware</option>
+              <option value="Software">Software</option>
+              <option value="Red/Conectividad">Red/Conectividad</option>
+              <option value="Impresoras">Impresoras</option>
+              <option value="Teléfonos">Teléfonos</option>
+              <option value="Accesos/Permisos">Accesos/Permisos</option>
+              <option value="Email">Email</option>
+              <option value="Otros">Otros</option>
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label>Prioridad:</label>
+            <select value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)}>
+              <option value="all">Todas</option>
+              <option value="critical">Crítica</option>
+              <option value="high">Alta</option>
+              <option value="medium">Media</option>
+              <option value="low">Baja</option>
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label>Ordenar:</label>
+            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+              <option value="newest">Más recientes</option>
+              <option value="oldest">Más antiguos</option>
+              <option value="priority-high">Prioridad ↓</option>
+              <option value="priority-low">Prioridad ↑</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="date-range-filter">
+          <div className="date-input-group">
+            <label>Desde:</label>
+            <input
+              type="date"
+              value={dateRange.start}
+              onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
+            />
+          </div>
+          <div className="date-input-group">
+            <label>Hasta:</label>
+            <input
+              type="date"
+              value={dateRange.end}
+              onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
+            />
+          </div>
+          {(searchTerm || filter !== 'all' || categoryFilter !== 'all' || priorityFilter !== 'all' || dateRange.start || dateRange.end) && (
+            <button className="btn btn-secondary" onClick={clearFilters}>
+              🔄 Limpiar filtros
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Filtros rápidos (legacy - mantener para compatibilidad visual) */}
       <div className="filters">
         <button
           className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
@@ -182,7 +412,19 @@ const ReportList = () => {
           className={`filter-btn ${filter === 'open' ? 'active' : ''}`}
           onClick={() => setFilter('open')}
         >
-          Abiertos ({stats.open + stats.inProgress})
+          Abiertos ({stats.open})
+        </button>
+        <button
+          className={`filter-btn ${filter === 'assigned' ? 'active' : ''}`}
+          onClick={() => setFilter('assigned')}
+        >
+          Asignados ({stats.assigned})
+        </button>
+        <button
+          className={`filter-btn ${filter === 'in-progress' ? 'active' : ''}`}
+          onClick={() => setFilter('in-progress')}
+        >
+          En Progreso ({stats.inProgress})
         </button>
         <button
           className={`filter-btn ${filter === 'closed' ? 'active' : ''}`}
@@ -239,7 +481,10 @@ const ReportList = () => {
                 >
                   {getStatusLabel(report.status)}
                 </span>
-                <button className="btn btn-secondary btn-small">
+                <button 
+                  className="btn btn-secondary btn-small"
+                  onClick={() => handleReportClick(report)}
+                >
                   Ver Detalles →
                 </button>
               </div>
@@ -248,14 +493,200 @@ const ReportList = () => {
         )}
       </div>
 
-      {/* Info para futuras funcionalidades */}
-      <div className="info-banner">
-        <div className="info-icon">ℹ️</div>
-        <div>
-          <strong>Próximamente en el Paso 6:</strong> Búsqueda, filtros avanzados,
-          ordenación y vista detallada de cada reporte con historial de cambios.
+      {/* Resultados info */}
+      {filteredReports.length > 0 && (
+        <div className="results-info">
+          Mostrando {filteredReports.length} de {reports.length} reportes
         </div>
-      </div>
+      )}
+
+      {/* Modal de Detalle con Historial */}
+      {showDetailModal && selectedReport && (
+        <div className="modal-overlay" onClick={handleCloseModal}>
+          <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>📋 Detalle del Reporte</h2>
+              <button className="modal-close" onClick={handleCloseModal}>&times;</button>
+            </div>
+
+            <div className="modal-body">
+              {/* Header del reporte */}
+              <div className="detail-header">
+                <div className="detail-title-section">
+                  <div className="detail-priority-badge">
+                    {getPriorityIcon(selectedReport.priority)}
+                    <span>{selectedReport.priority.toUpperCase()}</span>
+                  </div>
+                  <h3>{selectedReport.title}</h3>
+                  <span
+                    className="status-badge-large"
+                    style={{ backgroundColor: getStatusColor(selectedReport.status) }}
+                  >
+                    {getStatusLabel(selectedReport.status)}
+                  </span>
+                </div>
+                <div className="detail-meta-section">
+                  <p><strong>ID:</strong> #{selectedReport._id}</p>
+                  <p><strong>Categoría:</strong> {selectedReport.category}</p>
+                  <p><strong>Ubicación:</strong> 📍 {selectedReport.location}</p>
+                  <p><strong>Creado:</strong> {new Date(selectedReport.createdAt).toLocaleString('es-ES')}</p>
+                  {selectedReport.assignedTo && (
+                    <p><strong>Asignado a:</strong> {selectedReport.assignedTo}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Descripción */}
+              <div className="detail-section">
+                <h4>📝 Descripción</h4>
+                <p className="detail-description">{selectedReport.description}</p>
+              </div>
+
+              {/* Timeline de Historial */}
+              <div className="detail-section">
+                <h4>📅 Historial de Cambios</h4>
+                <div className="timeline">
+                  <div className="timeline-item">
+                    <div className="timeline-marker created"></div>
+                    <div className="timeline-content">
+                      <div className="timeline-header">
+                        <strong>Reporte Creado</strong>
+                        <span className="timeline-date">
+                          {new Date(selectedReport.createdAt).toLocaleString('es-ES')}
+                        </span>
+                      </div>
+                      <p>El reporte fue creado y enviado al equipo de soporte</p>
+                    </div>
+                  </div>
+
+                  {selectedReport.status !== 'open' && (
+                    <div className="timeline-item">
+                      <div className="timeline-marker assigned"></div>
+                      <div className="timeline-content">
+                        <div className="timeline-header">
+                          <strong>Reporte Asignado</strong>
+                          <span className="timeline-date">
+                            {new Date(Date.now() - 23 * 60 * 60 * 1000).toLocaleString('es-ES')}
+                          </span>
+                        </div>
+                        <p>Asignado a {selectedReport.assignedTo || 'técnico de soporte'}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedReport.status === 'in-progress' && (
+                    <div className="timeline-item">
+                      <div className="timeline-marker in-progress"></div>
+                      <div className="timeline-content">
+                        <div className="timeline-header">
+                          <strong>En Progreso</strong>
+                          <span className="timeline-date">
+                            {new Date(Date.now() - 18 * 60 * 60 * 1000).toLocaleString('es-ES')}
+                          </span>
+                        </div>
+                        <p>El técnico ha comenzado a trabajar en el problema</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedReport.status === 'closed' && (
+                    <>
+                      <div className="timeline-item">
+                        <div className="timeline-marker in-progress"></div>
+                        <div className="timeline-content">
+                          <div className="timeline-header">
+                            <strong>En Progreso</strong>
+                            <span className="timeline-date">
+                              {new Date(selectedReport.closedAt - 2 * 24 * 60 * 60 * 1000).toLocaleString('es-ES')}
+                            </span>
+                          </div>
+                          <p>El técnico ha comenzado a trabajar en el problema</p>
+                        </div>
+                      </div>
+                      <div className="timeline-item">
+                        <div className="timeline-marker closed"></div>
+                        <div className="timeline-content">
+                          <div className="timeline-header">
+                            <strong>Reporte Cerrado</strong>
+                            <span className="timeline-date">
+                              {new Date(selectedReport.closedAt).toLocaleString('es-ES')}
+                            </span>
+                          </div>
+                          <p>El problema ha sido resuelto exitosamente</p>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Información adicional */}
+              <div className="detail-section">
+                <h4>📊 Información Adicional</h4>
+                <div className="detail-grid">
+                  <div className="detail-item">
+                    <span className="detail-label">Tiempo transcurrido:</span>
+                    <span className="detail-value">{getTimeAgo(selectedReport.createdAt)}</span>
+                  </div>
+                  {selectedReport.status === 'closed' && selectedReport.closedAt && (
+                    <div className="detail-item">
+                      <span className="detail-label">Tiempo de resolución:</span>
+                      <span className="detail-value">
+                        {Math.floor((new Date(selectedReport.closedAt) - new Date(selectedReport.createdAt)) / (1000 * 60 * 60 * 24))} días
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Acciones de cambio de estado */}
+              <div className="detail-section">
+                <h4>⚙️ Cambiar Estado</h4>
+                <div className="status-actions">
+                  {selectedReport.status !== 'assigned' && (
+                    <button 
+                      className="btn btn-warning"
+                      onClick={() => handleStatusChange(selectedReport._id, 'assigned')}
+                    >
+                      🎯 Marcar como Asignado
+                    </button>
+                  )}
+                  {selectedReport.status !== 'in-progress' && selectedReport.status !== 'closed' && (
+                    <button 
+                      className="btn btn-info"
+                      onClick={() => handleStatusChange(selectedReport._id, 'in-progress')}
+                    >
+                      🔄 Marcar En Progreso
+                    </button>
+                  )}
+                  {selectedReport.status !== 'closed' && (
+                    <button 
+                      className="btn btn-success"
+                      onClick={() => handleStatusChange(selectedReport._id, 'closed')}
+                    >
+                      ✅ Marcar como Cerrado
+                    </button>
+                  )}
+                  {selectedReport.status === 'closed' && (
+                    <button 
+                      className="btn btn-danger"
+                      onClick={() => handleStatusChange(selectedReport._id, 'open')}
+                    >
+                      🔓 Reabrir Reporte
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={handleCloseModal}>
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

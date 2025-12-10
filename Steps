@@ -37,13 +37,14 @@
 	✅ Guardar metadatos: etiquetas, datos de análisis, ubicación, timestamp.
 	✅ Validación de tipos de archivo y tamaño máximo.
 
-6) Historial y estados del ticket
+6) ✅ COMPLETADO - Historial y estados del ticket
 
-	- Listas separadas: abiertos / cerrados.
-	- Filtros por estado (open, assigned, in-progress, closed).
-	- Búsqueda y ordenación de tickets.
-	- Detalle del reporte con toda la información e historial de cambios.
-	- Sistema de notificaciones para cambios de estado.
+	✅ Listas separadas por estado (5 estados: all, open, assigned, in-progress, closed).
+	✅ Filtros avanzados por estado, categoría (8), prioridad (4) y rango de fechas.
+	✅ Búsqueda en tiempo real (título, descripción, ubicación) y ordenación (4 criterios).
+	✅ Modal de detalle con información completa e historial visual con timeline.
+	✅ Sistema de notificaciones toast para cambios de estado (4 tipos).
+	✅ Acciones de cambio de estado con feedback inmediato.
 
 7) Funcionalidades adicionales
 
