@@ -299,15 +299,17 @@
 
 ## 🎯 Próximo Objetivo
 
-**PASO 5**: Implementar geolocalización e imágenes en reportes
+**PASO 6**: Implementar historial completo y filtros avanzados
 
 **Tareas principales**:
-1. Añadir Geolocation API al formulario
-2. Implementar upload de imágenes (multer ya configurado en backend)
-3. Mostrar mapas con ubicación
-4. Galería de imágenes
+1. Filtros avanzados en ReportList (fechas, categoría, prioridad, oficina)
+2. Historial de cambios en tickets
+3. Timeline visual de acciones
+4. Búsqueda avanzada
+5. Paginación de resultados
 
 ---
 
-**Última actualización**: Paso 4 completado  
+**Última actualización**: Paso 5 completado  
+**Progreso**: 50% (5 de 10 pasos completados)  
 **Archivo de referencia**: `Steps` (documento guía del proyecto)
