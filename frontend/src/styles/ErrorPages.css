@@ -1,0 +1,95 @@
+/* ================================
+   ERROR PAGES STYLES (404, 403)
+   ================================ */
+
+.error-page {
+  min-height: calc(100vh - 140px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.error-content {
+  text-align: center;
+  max-width: 600px;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-icon {
+  font-size: 6rem;
+  margin-bottom: 1rem;
+  animation: bounce 1s ease infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.error-content h1 {
+  font-size: 6rem;
+  margin: 0;
+  color: #2d3748;
+  font-weight: 900;
+}
+
+.error-content h2 {
+  font-size: 2rem;
+  margin: 1rem 0;
+  color: #4a5568;
+}
+
+.error-content p {
+  color: #718096;
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.error-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+  .error-icon {
+    font-size: 4rem;
+  }
+
+  .error-content h1 {
+    font-size: 4rem;
+  }
+
+  .error-content h2 {
+    font-size: 1.5rem;
+  }
+
+  .error-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .error-actions .btn {
+    width: 100%;
+  }
+}

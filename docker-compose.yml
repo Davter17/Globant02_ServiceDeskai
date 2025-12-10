@@ -61,7 +61,7 @@ services:
       NODE_ENV: development
       REACT_APP_API_URL: http://localhost:5000/api
       REACT_APP_SOCKET_URL: http://localhost:5000
-      WATCHPACK_POLLING: true
+      WATCHPACK_POLLING: "true"
     ports:
       - "3000:3000"
     volumes:
