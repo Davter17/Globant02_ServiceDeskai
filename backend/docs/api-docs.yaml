@@ -1,0 +1,1076 @@
+openapi: 3.0.3
+info:
+  title: Service Desk API
+  description: |
+    API REST para sistema de gestión de reportes de daños y fallos con:
+    - Autenticación JWT
+    - Control de acceso basado en roles (RBAC)
+    - Geolocalización
+    - Reconocimiento de imágenes con IA
+    - Chat en tiempo real (Socket.io)
+    
+    ## Roles y Permisos
+    
+    - **Admin**: Acceso completo (usuarios, oficinas, reportes, estadísticas)
+    - **ServiceDesk**: Gestión de reportes (ver todos, asignar, resolver)
+    - **User**: Gestión de reportes propios (crear, ver, actualizar, calificar)
+    
+    ## Autenticación
+    
+    La mayoría de endpoints requieren autenticación mediante JWT Bearer token:
+    ```
+    Authorization: Bearer <access_token>
+    ```
+    
+  version: 1.0.0
+  contact:
+    name: Service Desk Team
+    email: support@servicedesk.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:5000/api
+    description: Development server
+  - url: https://api.servicedesk.com/api
+    description: Production server
+
+tags:
+  - name: Authentication
+    description: Endpoints de autenticación y gestión de sesiones
+  - name: Reports
+    description: Gestión de reportes de incidencias
+  - name: Users
+    description: Gestión de usuarios (Admin only)
+  - name: Offices
+    description: Gestión de oficinas
+  - name: Chat
+    description: Sistema de chat en tiempo real
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token obtenido del endpoint /auth/login
+
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        name:
+          type: string
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          example: "john@example.com"
+        role:
+          type: string
+          enum: [user, servicedesk, admin]
+          example: "user"
+        isActive:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Office:
+      type: object
+      properties:
+        _id:
+          type: string
+        code:
+          type: string
+          example: "NY-MAIN-01"
+        name:
+          type: string
+          example: "New York Headquarters"
+        address:
+          type: string
+          example: "350 Fifth Avenue"
+        city:
+          type: string
+          example: "New York"
+        state:
+          type: string
+          example: "NY"
+        country:
+          type: string
+          example: "United States"
+        zipCode:
+          type: string
+          example: "10118"
+        capacity:
+          type: integer
+          example: 200
+        location:
+          type: object
+          properties:
+            type:
+              type: string
+              example: "Point"
+            coordinates:
+              type: array
+              items:
+                type: number
+              example: [-73.9857, 40.7484]
+        isActive:
+          type: boolean
+          example: true
+
+    Report:
+      type: object
+      properties:
+        _id:
+          type: string
+        category:
+          type: string
+          enum: [hardware, software, network, email, printer, phone, access, other]
+          example: "hardware"
+        priority:
+          type: string
+          enum: [low, medium, high, critical]
+          example: "high"
+        status:
+          type: string
+          enum: [open, in_progress, resolved, closed]
+          example: "open"
+        title:
+          type: string
+          example: "Computer not working"
+        description:
+          type: string
+          example: "My computer won't turn on"
+        location:
+          type: object
+          properties:
+            type:
+              type: string
+              example: "Point"
+            coordinates:
+              type: array
+              items:
+                type: number
+              example: [-73.9857, 40.7484]
+        images:
+          type: array
+          items:
+            type: string
+          example: ["/uploads/image1.jpg"]
+        imageAnalysis:
+          type: object
+          properties:
+            labels:
+              type: array
+              items:
+                type: string
+              example: ["computer", "desk", "monitor"]
+            description:
+              type: string
+              example: "A computer on a desk"
+        createdBy:
+          $ref: '#/components/schemas/User'
+        assignedTo:
+          $ref: '#/components/schemas/User'
+        office:
+          $ref: '#/components/schemas/Office'
+        resolution:
+          type: string
+        resolvedAt:
+          type: string
+          format: date-time
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        ratingComment:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: "Error message"
+
+    Success:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Operation successful"
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Registrar nuevo usuario
+      description: Crea una nueva cuenta de usuario con rol 'user' por defecto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+              properties:
+                name:
+                  type: string
+                  example: "John Doe"
+                email:
+                  type: string
+                  format: email
+                  example: "john@example.com"
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                  example: "Password123!"
+      responses:
+        '201':
+          description: Usuario creado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/User'
+                      accessToken:
+                        type: string
+                      refreshToken:
+                        type: string
+        '400':
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Iniciar sesión
+      description: Autenticar usuario y obtener tokens JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "admin@servicedesk.com"
+                password:
+                  type: string
+                  format: password
+                  example: "Admin123!"
+      responses:
+        '200':
+          description: Login exitoso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/User'
+                      accessToken:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                      refreshToken:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        '401':
+          description: Credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refrescar access token
+      description: Obtener un nuevo access token usando refresh token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '200':
+          description: Token refrescado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      accessToken:
+                        type: string
+                      refreshToken:
+                        type: string
+        '401':
+          description: Refresh token inválido o expirado
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Cerrar sesión
+      description: Invalida el refresh token del usuario
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '200':
+          description: Logout exitoso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '401':
+          description: No autenticado
+
+  /auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Obtener usuario actual
+      description: Retorna información del usuario autenticado
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Usuario obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: No autenticado
+
+  /reports:
+    get:
+      tags:
+        - Reports
+      summary: Listar reportes
+      description: |
+        Obtener lista de reportes según permisos:
+        - User: solo reportes propios
+        - ServiceDesk/Admin: todos los reportes
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [open, in_progress, resolved, closed]
+        - name: priority
+          in: query
+          schema:
+            type: string
+            enum: [low, medium, high, critical]
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de reportes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      reports:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Report'
+                      pagination:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                          page:
+                            type: integer
+                          pages:
+                            type: integer
+                          limit:
+                            type: integer
+
+    post:
+      tags:
+        - Reports
+      summary: Crear reporte
+      description: Crear un nuevo reporte (cualquier usuario autenticado)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - category
+                - priority
+                - title
+                - office
+              properties:
+                category:
+                  type: string
+                  enum: [hardware, software, network, email, printer, phone, access, other]
+                priority:
+                  type: string
+                  enum: [low, medium, high, critical]
+                title:
+                  type: string
+                description:
+                  type: string
+                office:
+                  type: string
+                latitude:
+                  type: number
+                longitude:
+                  type: number
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '201':
+          description: Reporte creado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Report'
+
+  /reports/{id}:
+    get:
+      tags:
+        - Reports
+      summary: Obtener reporte por ID
+      description: |
+        Obtener detalles de un reporte:
+        - User: solo reportes propios
+        - ServiceDesk/Admin: cualquier reporte
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Reporte encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Report'
+        '403':
+          description: Sin permiso para ver este reporte
+        '404':
+          description: Reporte no encontrado
+
+    put:
+      tags:
+        - Reports
+      summary: Actualizar reporte
+      description: |
+        Actualizar reporte:
+        - User: solo reportes propios
+        - ServiceDesk/Admin: cualquier reporte
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                priority:
+                  type: string
+                status:
+                  type: string
+      responses:
+        '200':
+          description: Reporte actualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Report'
+
+    delete:
+      tags:
+        - Reports
+      summary: Eliminar reporte
+      description: Eliminar reporte (solo Admin)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Reporte eliminado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '403':
+          description: Sin permiso (solo Admin)
+
+  /reports/{id}/assign:
+    post:
+      tags:
+        - Reports
+      summary: Asignar reporte
+      description: Asignar reporte a un usuario ServiceDesk (solo ServiceDesk/Admin)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+              properties:
+                userId:
+                  type: string
+                  description: ID del usuario ServiceDesk
+      responses:
+        '200':
+          description: Reporte asignado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Report'
+        '403':
+          description: Sin permiso (solo ServiceDesk/Admin)
+
+  /reports/{id}/resolve:
+    post:
+      tags:
+        - Reports
+      summary: Resolver reporte
+      description: Marcar reporte como resuelto (solo ServiceDesk/Admin)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - resolution
+              properties:
+                resolution:
+                  type: string
+                  description: Descripción de la solución
+      responses:
+        '200':
+          description: Reporte resuelto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Report'
+
+  /reports/{id}/rate:
+    post:
+      tags:
+        - Reports
+      summary: Calificar reporte
+      description: Calificar servicio de un reporte resuelto (solo creador del reporte)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - rating
+              properties:
+                rating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                comment:
+                  type: string
+      responses:
+        '200':
+          description: Reporte calificado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Report'
+
+  /reports/stats:
+    get:
+      tags:
+        - Reports
+      summary: Obtener estadísticas
+      description: |
+        Obtener estadísticas de reportes:
+        - User: solo estadísticas propias
+        - ServiceDesk/Admin: estadísticas globales
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Estadísticas obtenidas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      byStatus:
+                        type: object
+                      byPriority:
+                        type: object
+                      byCategory:
+                        type: object
+                      averageRating:
+                        type: number
+
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Listar usuarios
+      description: Obtener lista de todos los usuarios (solo Admin)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: role
+          in: query
+          schema:
+            type: string
+        - name: isActive
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Lista de usuarios
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      users:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/User'
+                      pagination:
+                        type: object
+        '403':
+          description: Sin permiso (solo Admin)
+
+  /users/{id}:
+    get:
+      tags:
+        - Users
+      summary: Obtener usuario por ID
+      description: Ver detalles de un usuario (solo Admin)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/User'
+
+    put:
+      tags:
+        - Users
+      summary: Actualizar usuario
+      description: Actualizar datos de usuario (solo Admin)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                role:
+                  type: string
+                isActive:
+                  type: boolean
+      responses:
+        '200':
+          description: Usuario actualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/User'
+
+    delete:
+      tags:
+        - Users
+      summary: Eliminar usuario
+      description: Eliminar usuario (solo Admin)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Usuario eliminado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+
+  /offices:
+    get:
+      tags:
+        - Offices
+      summary: Listar oficinas
+      description: Obtener lista de oficinas (todos los usuarios autenticados)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: isActive
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Lista de oficinas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      offices:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Office'
+
+    post:
+      tags:
+        - Offices
+      summary: Crear oficina
+      description: Crear nueva oficina (solo Admin)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+                - name
+                - address
+                - city
+                - country
+              properties:
+                code:
+                  type: string
+                name:
+                  type: string
+                address:
+                  type: string
+                city:
+                  type: string
+                state:
+                  type: string
+                country:
+                  type: string
+                zipCode:
+                  type: string
+                capacity:
+                  type: integer
+                latitude:
+                  type: number
+                longitude:
+                  type: number
+      responses:
+        '201':
+          description: Oficina creada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    $ref: '#/components/schemas/Office'
+
+  /offices/nearby:
+    get:
+      tags:
+        - Offices
+      summary: Buscar oficinas cercanas
+      description: Buscar oficinas por geolocalización
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: latitude
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: longitude
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: maxDistance
+          in: query
+          schema:
+            type: number
+            default: 5000
+            description: Distancia máxima en metros
+      responses:
+        '200':
+          description: Oficinas cercanas encontradas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/Office'
+                        - type: object
+                          properties:
+                            distance:
+                              type: number
+                              description: Distancia en metros
