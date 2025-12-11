@@ -1,13 +1,16 @@
 require('dotenv').config();
 const express = require('express');
+const http = require('http');
 const cors = require('cors');
 const morgan = require('morgan');
 const { connectDB, getConnectionState } = require('./config/database');
+const { initializeSocket } = require('./config/socket');
 
 // Security middleware
 const security = require('./middleware/security');
 
 const app = express();
+const httpServer = http.createServer(app);
 const PORT = process.env.PORT || 5000;
 
 // ======================================
@@ -157,11 +160,18 @@ const startServer = async () => {
     // 1. Conectar a MongoDB primero
     await connectDB();
 
-    // 2. Iniciar servidor Express
-    app.listen(PORT, () => {
+    // 2. Inicializar Socket.io
+    const io = initializeSocket(httpServer);
+    
+    // Adjuntar io al app para uso en rutas
+    app.set('io', io);
+
+    // 3. Iniciar servidor HTTP (con Socket.io)
+    httpServer.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📝 Environment: ${process.env.NODE_ENV}`);
       console.log(`🔗 Frontend URL: ${process.env.FRONTEND_URL}`);
+      console.log(`💬 Socket.io enabled`);
       console.log(`✅ Server ready to accept requests`);
     });
 

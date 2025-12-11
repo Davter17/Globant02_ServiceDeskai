@@ -18,6 +18,12 @@ const {
 } = require('../controllers/officeController');
 const { protect, authorize, optionalAuth } = require('../middleware/auth');
 const { publicLimiter, deleteLimiter } = require('../middleware/rateLimiter');
+const {
+  validateCreateOffice,
+  validateUpdateOffice,
+  validateMongoId,
+  validatePagination
+} = require('../middleware/validators');
 
 /**
  * @route   GET /api/offices/nearby/:lng/:lat
@@ -46,28 +52,28 @@ router.get('/:id/workstations/:workstationId', getWorkstation);
  * @desc    Crear nueva oficina
  * @access  Admin only
  */
-router.post('/', protect, authorize('admin'), createOffice);
+router.post('/', protect, authorize('admin'), validateCreateOffice, createOffice);
 
 /**
  * @route   GET /api/offices
  * @desc    Obtener todas las oficinas
  * @access  Public
  */
-router.get('/', getAllOffices);
+router.get('/', validatePagination, getAllOffices);
 
 /**
  * @route   GET /api/offices/:id
  * @desc    Obtener oficina por ID
  * @access  Public
  */
-router.get('/:id', getOfficeById);
+router.get('/:id', validateMongoId, getOfficeById);
 
 /**
  * @route   PUT /api/offices/:id
  * @desc    Actualizar oficina
  * @access  Admin only
  */
-router.put('/:id', protect, authorize('admin'), updateOffice);
+router.put('/:id', protect, authorize('admin'), validateMongoId, validateUpdateOffice, updateOffice);
 
 /**
  * @route   DELETE /api/offices/:id
@@ -75,6 +81,6 @@ router.put('/:id', protect, authorize('admin'), updateOffice);
  * @access  Admin only
  * @limit   5 por hora
  */
-router.delete('/:id', protect, authorize('admin'), deleteLimiter, deleteOffice);
+router.delete('/:id', protect, authorize('admin'), deleteLimiter, validateMongoId, deleteOffice);
 
 module.exports = router;

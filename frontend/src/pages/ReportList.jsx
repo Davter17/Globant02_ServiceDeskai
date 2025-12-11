@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import NotificationToast from '../components/NotificationToast';
 import { useNotification } from '../utils/useNotification';
+import { useModalKeyboard } from '../hooks/useKeyboardNavigation';
 import '../styles/ReportList.css';
 
 const ReportList = () => {
@@ -17,6 +18,12 @@ const ReportList = () => {
   const [selectedReport, setSelectedReport] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const { notification, showNotification, clearNotification } = useNotification();
+  
+  // Keyboard navigation for modal
+  const modalRef = useModalKeyboard(showDetailModal, () => {
+    setShowDetailModal(false);
+    setSelectedReport(null);
+  });
 
   useEffect(() => {
     // TODO: Cargar reportes desde el backend
@@ -502,10 +509,21 @@ const ReportList = () => {
 
       {/* Modal de Detalle con Historial */}
       {showDetailModal && selectedReport && (
-        <div className="modal-overlay" onClick={handleCloseModal}>
-          <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()}>
+        <div 
+          className="modal-overlay" 
+          onClick={handleCloseModal}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
+          aria-describedby="modal-description"
+        >
+          <div 
+            ref={modalRef}
+            className="modal-content modal-large" 
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header">
-              <h2>📋 Detalle del Reporte</h2>
+              <h2 id="modal-title">📋 Detalle del Reporte</h2>
               <button className="modal-close" onClick={handleCloseModal}>&times;</button>
             </div>
 

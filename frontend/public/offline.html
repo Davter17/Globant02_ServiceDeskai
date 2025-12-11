@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#667eea" />
+    <title>Sin conexión - Service Desk</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+          'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-align: center;
+        padding: 2rem;
+      }
+
+      .offline-container {
+        max-width: 600px;
+        animation: fadeIn 0.5s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .offline-icon {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+      }
+
+      p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        opacity: 0.95;
+        line-height: 1.6;
+      }
+
+      .btn-retry {
+        background: white;
+        color: #667eea;
+        border: none;
+        padding: 1rem 2.5rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-retry:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      .btn-retry:active {
+        transform: translateY(0);
+      }
+
+      .tips {
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .tips h2 {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        opacity: 0.9;
+      }
+
+      .tips ul {
+        list-style: none;
+        text-align: left;
+        display: inline-block;
+      }
+
+      .tips li {
+        margin-bottom: 0.5rem;
+        opacity: 0.85;
+        font-size: 0.95rem;
+      }
+
+      .tips li::before {
+        content: '✓ ';
+        margin-right: 0.5rem;
+      }
+
+      @media (max-width: 768px) {
+        h1 {
+          font-size: 2rem;
+        }
+
+        p {
+          font-size: 1rem;
+        }
+
+        .offline-icon {
+          font-size: 4rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="offline-container">
+      <div class="offline-icon">📡</div>
+      <h1>Sin conexión a Internet</h1>
+      <p>
+        No podemos conectar con el servidor en este momento. 
+        Por favor, verifica tu conexión a Internet e intenta nuevamente.
+      </p>
+      <button class="btn-retry" onclick="window.location.reload()">
+        🔄 Reintentar
+      </button>
+
+      <div class="tips">
+        <h2>Posibles soluciones:</h2>
+        <ul>
+          <li>Verifica que tu WiFi o datos móviles estén activados</li>
+          <li>Intenta desactivar y volver a activar el modo avión</li>
+          <li>Comprueba que no estés en modo sin conexión</li>
+          <li>Verifica que el servidor esté disponible</li>
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      // Intentar reconectar automáticamente cada 5 segundos
+      let retryCount = 0;
+      const maxRetries = 12; // 1 minuto máximo
+
+      function checkConnection() {
+        if (retryCount >= maxRetries) {
+          console.log('Max retries reached');
+          return;
+        }
+
+        fetch('/health', { method: 'HEAD', cache: 'no-cache' })
+          .then(() => {
+            console.log('Connection restored!');
+            window.location.reload();
+          })
+          .catch(() => {
+            retryCount++;
+            setTimeout(checkConnection, 5000);
+          });
+      }
+
+      // Iniciar verificación automática después de 5 segundos
+      setTimeout(checkConnection, 5000);
+
+      // También escuchar el evento online
+      window.addEventListener('online', () => {
+        console.log('Browser reported online');
+        setTimeout(() => window.location.reload(), 1000);
+      });
+    </script>
+  </body>
+</html>

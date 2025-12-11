@@ -1,0 +1,90 @@
+/* Skip Links Styles */
+
+.skip-links {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  background: var(--primary-600, #5a67d8);
+  color: white;
+  padding: 1rem 1.5rem;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 0 0 8px 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: top 0.3s ease;
+  outline: none;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 3px solid var(--primary-400, #7c85f2);
+  outline-offset: 2px;
+}
+
+.skip-link:hover {
+  background: var(--primary-700, #4c51bf);
+}
+
+[data-theme="dark"] .skip-link {
+  background: var(--primary-500, #7c85f2);
+}
+
+[data-theme="dark"] .skip-link:focus {
+  outline-color: var(--primary-300, #a5b4fc);
+}
+
+[data-theme="dark"] .skip-link:hover {
+  background: var(--primary-600, #6366f1);
+}
+
+/* Screen reader only text helper */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus visible for all interactive elements */
+:focus-visible {
+  outline: 3px solid var(--primary-500, #667eea);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+[data-theme="dark"] :focus-visible {
+  outline-color: var(--primary-400, #7c85f2);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .skip-link {
+    border: 2px solid currentColor;
+  }
+  
+  :focus-visible {
+    outline-width: 4px;
+    outline-offset: 3px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .skip-link {
+    transition: none;
+  }
+}

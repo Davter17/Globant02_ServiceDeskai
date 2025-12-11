@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../redux/slices/authSlice';
+import ThemeToggle from './ThemeToggle';
+import SkipLinks from './SkipLinks';
 import '../styles/Layout.css';
 
 const Layout = ({ children }) => {
@@ -65,10 +67,12 @@ const Layout = ({ children }) => {
 
   return (
     <div className="layout">
-      <header className="navbar">
+      <SkipLinks />
+      
+      <header className="navbar" role="banner">
         <div className="navbar-container">
           <Link to="/" className="navbar-brand" onClick={closeMobileMenu}>
-            <span className="brand-icon">🎫</span>
+            <span className="brand-icon" aria-hidden="true">🎫</span>
             <span className="brand-text">Service Desk</span>
           </Link>
 
@@ -77,39 +81,49 @@ const Layout = ({ children }) => {
               <button
                 className="mobile-menu-toggle"
                 onClick={toggleMobileMenu}
-                aria-label="Toggle menu"
+                aria-label={isMobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
                 aria-expanded={isMobileMenuOpen}
+                aria-controls="main-navigation"
               >
-                {isMobileMenuOpen ? '✕' : '☰'}
+                <span aria-hidden="true">{isMobileMenuOpen ? '✕' : '☰'}</span>
               </button>
 
-              <nav className={`navbar-nav ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
-                <ul className="nav-links">
+              <nav 
+                id="main-navigation" 
+                className={`navbar-nav ${isMobileMenuOpen ? 'mobile-open' : ''}`}
+                role="navigation"
+                aria-label="Navegación principal"
+              >
+                <ul className="nav-links" role="menubar">
                   {navigationLinks.map((link) => (
-                    <li key={link.path}>
+                    <li key={link.path} role="none">
                       <Link
                         to={link.path}
                         className={`nav-link ${isActive(link.path)}`}
                         onClick={closeMobileMenu}
+                        role="menuitem"
+                        aria-current={isActive(link.path) ? 'page' : undefined}
                       >
-                        <span className="nav-icon">{link.icon}</span>
+                        <span className="nav-icon" aria-hidden="true">{link.icon}</span>
                         <span className="nav-label">{link.label}</span>
                       </Link>
                     </li>
                   ))}
                 </ul>
 
-                <div className="navbar-user">
+                <div className="navbar-user" role="region" aria-label="Información de usuario">
+                  <ThemeToggle />
                   <div className="user-info">
-                    <span className="user-name">{user?.name}</span>
-                    <span className="user-role">{user?.role}</span>
+                    <span className="user-name" aria-label={`Usuario: ${user?.name}`}>{user?.name}</span>
+                    <span className="user-role" aria-label={`Rol: ${user?.role}`}>{user?.role}</span>
                   </div>
                   <button
                     onClick={handleLogout}
                     className="btn btn-logout"
                     aria-label="Cerrar sesión"
+                    title="Cerrar sesión"
                   >
-                    <span className="logout-icon">🚪</span>
+                    <span className="logout-icon" aria-hidden="true">🚪</span>
                     <span className="logout-text">Salir</span>
                   </button>
                 </div>
@@ -118,15 +132,15 @@ const Layout = ({ children }) => {
           )}
 
           {!isAuthenticated && (
-            <nav className="navbar-nav">
-              <ul className="nav-links">
-                <li>
-                  <Link to="/login" className="nav-link">
+            <nav className="navbar-nav" role="navigation" aria-label="Navegación de autenticación">
+              <ul className="nav-links" role="menubar">
+                <li role="none">
+                  <Link to="/login" className="nav-link" role="menuitem">
                     Iniciar Sesión
                   </Link>
                 </li>
-                <li>
-                  <Link to="/register" className="btn btn-primary btn-small">
+                <li role="none">
+                  <Link to="/register" className="btn btn-primary btn-small" role="menuitem">
                     Registrarse
                   </Link>
                 </li>
@@ -136,20 +150,26 @@ const Layout = ({ children }) => {
         </div>
       </header>
 
-      <main className="main-content">
+      <main 
+        id="main-content" 
+        className="main-content" 
+        role="main"
+        tabIndex="-1"
+        aria-label="Contenido principal"
+      >
         {children}
       </main>
 
-      <footer className="footer">
+      <footer className="footer" role="contentinfo">
         <div className="footer-container">
           <p>&copy; 2025 Service Desk. Todos los derechos reservados.</p>
-          <p className="footer-links">
-            <a href="#privacy">Privacidad</a>
-            <span className="separator">•</span>
-            <a href="#terms">Términos</a>
-            <span className="separator">•</span>
-            <a href="#contact">Contacto</a>
-          </p>
+          <nav className="footer-links" aria-label="Enlaces del pie de página">
+            <a href="#privacy" title="Política de privacidad">Privacidad</a>
+            <span className="separator" aria-hidden="true">•</span>
+            <a href="#terms" title="Términos y condiciones">Términos</a>
+            <span className="separator" aria-hidden="true">•</span>
+            <a href="#contact" title="Información de contacto">Contacto</a>
+          </nav>
         </div>
       </footer>
     </div>

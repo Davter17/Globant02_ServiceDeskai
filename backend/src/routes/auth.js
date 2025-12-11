@@ -22,6 +22,13 @@ const {
   registerLimiter,
   refreshLimiter
 } = require('../middleware/rateLimiter');
+const {
+  validateRegister,
+  validateLogin,
+  validateUpdateProfile,
+  validateChangePassword,
+  validateRefreshToken
+} = require('../middleware/validators');
 
 /**
  * @route   POST /api/auth/register
@@ -29,7 +36,7 @@ const {
  * @access  Public
  * @limit   3 registros por hora por IP
  */
-router.post('/register', registerLimiter, register);
+router.post('/register', registerLimiter, validateRegister, register);
 
 /**
  * @route   POST /api/auth/login
@@ -37,7 +44,7 @@ router.post('/register', registerLimiter, register);
  * @access  Public
  * @limit   5 intentos por 15 minutos
  */
-router.post('/login', authLimiter, login);
+router.post('/login', authLimiter, validateLogin, login);
 
 /**
  * @route   POST /api/auth/refresh
@@ -45,7 +52,7 @@ router.post('/login', authLimiter, login);
  * @access  Public
  * @limit   10 por 15 minutos
  */
-router.post('/refresh', refreshLimiter, refreshToken);
+router.post('/refresh', refreshLimiter, validateRefreshToken, refreshToken);
 
 /**
  * @route   POST /api/auth/logout
@@ -66,13 +73,13 @@ router.get('/me', protect, getCurrentUser);
  * @desc    Actualizar perfil
  * @access  Private
  */
-router.put('/profile', protect, updateProfile);
+router.put('/profile', protect, validateUpdateProfile, updateProfile);
 
 /**
  * @route   PUT /api/auth/password
  * @desc    Cambiar contraseña
  * @access  Private
  */
-router.put('/password', protect, changePassword);
+router.put('/password', protect, validateChangePassword, changePassword);
 
 module.exports = router;

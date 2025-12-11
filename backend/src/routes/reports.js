@@ -24,6 +24,17 @@ const {
   statsLimiter,
   deleteLimiter
 } = require('../middleware/rateLimiter');
+const {
+  validateCreateReport,
+  validateUpdateReport,
+  validateAssignReport,
+  validateResolveReport,
+  validateRating,
+  validateShareReport,
+  validateMongoId,
+  validatePagination,
+  validateReportFilters
+} = require('../middleware/validators');
 
 /**
  * @route   GET /api/reports/stats
@@ -39,14 +50,14 @@ router.get('/stats', protect, authorize('servicedesk', 'admin'), statsLimiter, g
  * @access  Private (any authenticated user)
  * @limit   20 reportes por hora
  */
-router.post('/', protect, createReportLimiter, createReport);
+router.post('/', protect, createReportLimiter, validateCreateReport, createReport);
 
 /**
  * @route   GET /api/reports
  * @desc    Obtener todos los reportes (filtrados por rol)
  * @access  Private
  */
-router.get('/', protect, getAllReports);
+router.get('/', protect, validatePagination, validateReportFilters, getAllReports);
 
 /**
  * @route   GET /api/reports/:id
@@ -88,7 +99,15 @@ router.post('/:id/close', protect, authorize('servicedesk', 'admin'), closeRepor
  * @desc    Agregar calificación al reporte
  * @access  Private (solo el dueño del reporte)
  */
-router.post('/:id/rating', protect, addRating);
+router.post('/:id/rating', protect, validateMongoId, validateRating, addRating);
+
+/**
+ * @route   POST /api/reports/:id/share
+ * @desc    Compartir reporte por email
+ * @access  Private (creador, asignado, o admin/servicedesk)
+ */
+const { shareReport } = require('../controllers/emailController');
+router.post('/:id/share', protect, validateMongoId, validateShareReport, shareReport);
 
 /**
  * @route   DELETE /api/reports/:id
@@ -96,6 +115,6 @@ router.post('/:id/rating', protect, addRating);
  * @access  Admin only
  * @limit   5 por hora
  */
-router.delete('/:id', protect, authorize('admin'), deleteLimiter, deleteReport);
+router.delete('/:id', protect, authorize('admin'), deleteLimiter, validateMongoId, deleteReport);
 
 module.exports = router;

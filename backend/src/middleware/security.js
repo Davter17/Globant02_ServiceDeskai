@@ -61,19 +61,104 @@ const corsOptions = {
  * Headers de seguridad HTTP
  */
 const helmetOptions = {
-  // Content Security Policy
+  // Content Security Policy (CSP) mejorado
   contentSecurityPolicy: {
+    useDefaults: false,
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-      fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", 'data:', 'https:', 'blob:'], // Permitir imágenes de múltiples fuentes
-      connectSrc: ["'self'", process.env.FRONTEND_URL || 'http://localhost:3000'],
+      baseUri: ["'self'"],
+      
+      // Scripts: permitir solo de origen propio
+      scriptSrc: [
+        "'self'",
+        // En desarrollo, permitir eval para HMR (React, Vite)
+        ...(process.env.NODE_ENV === 'development' ? ["'unsafe-eval'"] : [])
+      ],
+      scriptSrcAttr: ["'none'"],
+      
+      // Estilos: permitir inline styles (necesario para React) y Google Fonts
+      styleSrc: [
+        "'self'",
+        "'unsafe-inline'", // Necesario para styled-components, emotion, etc.
+        'https://fonts.googleapis.com'
+      ],
+      styleSrcElem: [
+        "'self'",
+        "'unsafe-inline'",
+        'https://fonts.googleapis.com'
+      ],
+      styleSrcAttr: ["'unsafe-inline'"],
+      
+      // Fuentes
+      fontSrc: [
+        "'self'",
+        'data:',
+        'https://fonts.gstatic.com',
+        'https://fonts.googleapis.com'
+      ],
+      
+      // Imágenes: permitir data URIs, HTTPS y blob (para preview de archivos)
+      imgSrc: [
+        "'self'",
+        'data:',
+        'https:',
+        'blob:',
+        // APIs de imágenes (Pollinations.ai, etc.)
+        'https://image.pollinations.ai',
+        'https://*.googleapis.com'
+      ],
+      
+      // Conexiones: API del frontend y WebSockets
+      connectSrc: [
+        "'self'",
+        process.env.FRONTEND_URL || 'http://localhost:3000',
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'ws://localhost:*',
+        'wss://localhost:*',
+        // APIs externas
+        'https://image.pollinations.ai',
+        'https://*.googleapis.com'
+      ],
+      
+      // Media: permitir desde origen propio
+      mediaSrc: ["'self'", 'blob:', 'data:'],
+      
+      // Frames: denegar (prevenir clickjacking)
       frameSrc: ["'none'"],
+      frameAncestors: ["'none'"],
+      
+      // Objects: denegar (prevenir Flash, Java, etc.)
       objectSrc: ["'none'"],
-      upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null
-    }
+      
+      // Workers y manifests
+      workerSrc: ["'self'", 'blob:'],
+      manifestSrc: ["'self'"],
+      
+      // Formularios: solo a origen propio
+      formAction: ["'self'"],
+      
+      // Upgrade insecure requests en producción
+      ...(process.env.NODE_ENV === 'production' ? {
+        upgradeInsecureRequests: []
+      } : {})
+    },
+    
+    // Reportar violaciones CSP (útil en desarrollo)
+    reportOnly: process.env.CSP_REPORT_ONLY === 'true'
+  },
+  
+  // Cross-Origin-Embedder-Policy
+  crossOriginEmbedderPolicy: false, // Deshabilitado para compatibilidad con APIs externas
+  
+  // Cross-Origin-Opener-Policy
+  crossOriginOpenerPolicy: {
+    policy: 'same-origin'
+  },
+  
+  // Cross-Origin-Resource-Policy
+  crossOriginResourcePolicy: {
+    policy: 'cross-origin' // Permitir recursos cross-origin
   },
   
   // X-DNS-Prefetch-Control: controlar DNS prefetching
@@ -81,20 +166,20 @@ const helmetOptions = {
     allow: false
   },
 
-  // X-Frame-Options: prevenir clickjacking
+  // X-Frame-Options: prevenir clickjacking (redundante con CSP pero útil para navegadores antiguos)
   frameguard: {
     action: 'deny'
   },
 
-  // Hide X-Powered-By header
+  // Hide X-Powered-By header (ocultar tecnología usada)
   hidePoweredBy: true,
 
-  // HTTP Strict Transport Security (HSTS)
-  hsts: {
-    maxAge: 31536000, // 1 año
+  // HTTP Strict Transport Security (HSTS) - Solo en producción con HTTPS
+  hsts: process.env.NODE_ENV === 'production' ? {
+    maxAge: 31536000, // 1 año en segundos
     includeSubDomains: true,
     preload: true
-  },
+  } : false,
 
   // X-Download-Options para IE8+
   ieNoOpen: true,
@@ -102,17 +187,20 @@ const helmetOptions = {
   // X-Content-Type-Options: prevenir MIME sniffing
   noSniff: true,
 
+  // Origin-Agent-Cluster: aislar contexto de ejecución
+  originAgentCluster: true,
+
   // X-Permitted-Cross-Domain-Policies
   permittedCrossDomainPolicies: {
     permittedPolicies: 'none'
   },
 
-  // Referrer-Policy
+  // Referrer-Policy: controlar información del referrer
   referrerPolicy: {
     policy: 'strict-origin-when-cross-origin'
   },
 
-  // X-XSS-Protection (legacy pero aún útil)
+  // X-XSS-Protection (legacy pero aún útil para navegadores viejos)
   xssFilter: true
 };
 
