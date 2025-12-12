@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
-import { register } from '../redux/slices/authSlice';
+import { register, clearError } from '../redux/slices/authSlice';
 import '../styles/Auth.css';
 
 const Register = () => {
@@ -18,6 +18,10 @@ const Register = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch]);
 
   const handleChange = (e) => {
     setFormData({
@@ -61,8 +65,13 @@ const Register = () => {
     }
 
     // Validar teléfono (opcional, pero si se proporciona debe ser válido)
-    if (formData.phone && !/^[\d\s\-\+\(\)]+$/.test(formData.phone)) {
-      errors.phone = 'Formato de teléfono inválido';
+    if (formData.phone && formData.phone.trim() !== '') {
+      const phoneRegex = /^[\d\s\-\+\(\)]+$/;
+      if (!phoneRegex.test(formData.phone)) {
+        errors.phone = 'El teléfono solo puede contener números, espacios, +, -, ( y )';
+      } else if (formData.phone.length > 20) {
+        errors.phone = 'El teléfono es demasiado largo';
+      }
     }
 
     setValidationErrors(errors);
@@ -78,6 +87,12 @@ const Register = () => {
 
     try {
       const { confirmPassword, ...registerData } = formData;
+      
+      // Si el teléfono está vacío, no lo enviamos
+      if (!registerData.phone || registerData.phone.trim() === '') {
+        delete registerData.phone;
+      }
+      
       const result = await dispatch(register(registerData)).unwrap();
       if (result) {
         navigate('/dashboard');

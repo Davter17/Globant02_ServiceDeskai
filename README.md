@@ -89,9 +89,11 @@
 
 | Rol | Email | Password |
 |-----|-------|----------|
-| **Admin** | admin@servicedesk.com | Admin123! |
-| **ServiceDesk** | servicedesk@servicedesk.com | Service123! |
-| **User** | user@servicedesk.com | User123! |
+| **Admin** | admin@globant.com | AdminGlobant2024! |
+| **ServiceDesk** | servicedesk@globant.com | ServiceDesk2024! |
+| **User** | juan.perez@globant.com | UserGlobant2024! |
+| **User** | ana.martinez@globant.com | UserGlobant2024! |
+| **User** | luis.fernandez@globant.com | UserGlobant2024! |
 
 ### Capturas de Pantalla
 

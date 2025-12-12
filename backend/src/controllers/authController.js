@@ -113,9 +113,9 @@ const login = async (req, res) => {
     const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
     
     if (!user) {
-      return res.status(401).json({
+      return res.status(404).json({
         success: false,
-        message: 'Credenciales inválidas'
+        message: 'No existe una cuenta con este email'
       });
     }
 
@@ -132,7 +132,7 @@ const login = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
-        message: 'Credenciales inválidas'
+        message: 'La contraseña es incorrecta'
       });
     }
 

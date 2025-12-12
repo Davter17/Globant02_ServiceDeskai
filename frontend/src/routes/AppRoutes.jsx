@@ -17,6 +17,9 @@ import OfficeManagement from '../pages/OfficeManagement';
 import AdminDashboard from '../pages/AdminDashboard';
 import Unauthorized from '../pages/Unauthorized';
 import NotFound from '../pages/NotFound';
+import Privacy from '../pages/Privacy';
+import Terms from '../pages/Terms';
+import Contact from '../pages/Contact';
 
 /**
  * AppRoutes Component
@@ -143,6 +146,11 @@ const AppRoutes = () => {
 
       {/* Página de error de autorización */}
       <Route path="/unauthorized" element={<Unauthorized />} />
+
+      {/* Páginas estáticas del footer */}
+      <Route path="/privacy" element={<Privacy />} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/contact" element={<Contact />} />
 
       {/* Página 404 - Debe estar al final */}
       <Route path="/404" element={<NotFound />} />

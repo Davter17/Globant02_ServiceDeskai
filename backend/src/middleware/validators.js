@@ -59,8 +59,9 @@ const validateRegister = [
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/).withMessage('La contraseña debe contener al menos una mayúscula, una minúscula y un número'),
   
   body('phone')
-    .optional()
+    .optional({ checkFalsy: true })
     .trim()
+    .if(body('phone').notEmpty())
     .matches(/^[\d\s\-\+\(\)]+$/).withMessage('Formato de teléfono inválido')
     .isLength({ max: 20 }).withMessage('El teléfono es demasiado largo'),
   

@@ -33,38 +33,48 @@ const log = {
 // Datos de usuarios iniciales
 const users = [
   {
-    name: 'Admin User',
-    email: 'admin@servicedesk.com',
-    password: 'Admin123!',
+    name: 'Carlos Rodriguez',
+    email: 'admin@globant.com',
+    password: 'AdminGlobant2024!',
     role: 'admin',
+    phone: '5551234567',
+    department: 'IT Administration',
     isActive: true
   },
   {
-    name: 'John ServiceDesk',
-    email: 'servicedesk@servicedesk.com',
-    password: 'Service123!',
+    name: 'Maria Garcia',
+    email: 'servicedesk@globant.com',
+    password: 'ServiceDesk2024!',
     role: 'servicedesk',
+    phone: '5552345678',
+    department: 'Technical Support',
     isActive: true
   },
   {
-    name: 'Jane Smith',
-    email: 'user@servicedesk.com',
-    password: 'User123!',
+    name: 'Juan Perez',
+    email: 'juan.perez@globant.com',
+    password: 'UserGlobant2024!',
     role: 'user',
+    phone: '5553456789',
+    department: 'Development',
     isActive: true
   },
   {
-    name: 'Bob Johnson',
-    email: 'bob@servicedesk.com',
-    password: 'User123!',
+    name: 'Ana Martinez',
+    email: 'ana.martinez@globant.com',
+    password: 'UserGlobant2024!',
     role: 'user',
+    phone: '5554567890',
+    department: 'Design',
     isActive: true
   },
   {
-    name: 'Alice Williams',
-    email: 'alice@servicedesk.com',
-    password: 'User123!',
+    name: 'Luis Fernandez',
+    email: 'luis.fernandez@globant.com',
+    password: 'UserGlobant2024!',
     role: 'user',
+    phone: '5555678901',
+    department: 'QA',
     isActive: true
   }
 ];
@@ -74,60 +84,68 @@ const offices = [
   {
     code: 'NY-MAIN-01',
     name: 'New York Headquarters',
-    address: '350 Fifth Avenue',
-    city: 'New York',
-    state: 'NY',
-    country: 'United States',
-    zipCode: '10118',
     capacity: 200,
     location: {
-      type: 'Point',
-      coordinates: [-73.9857, 40.7484] // [longitude, latitude]
+      address: '350 Fifth Avenue',
+      city: 'New York',
+      state: 'NY',
+      country: 'United States',
+      postalCode: '10118',
+      coordinates: {
+        latitude: 40.7484,
+        longitude: -73.9857
+      }
     },
     isActive: true
   },
   {
     code: 'LA-WEST-01',
     name: 'Los Angeles Office',
-    address: '633 West 5th Street',
-    city: 'Los Angeles',
-    state: 'CA',
-    country: 'United States',
-    zipCode: '90071',
     capacity: 150,
     location: {
-      type: 'Point',
-      coordinates: [-118.2537, 34.0522]
+      address: '633 West 5th Street',
+      city: 'Los Angeles',
+      state: 'CA',
+      country: 'United States',
+      postalCode: '90071',
+      coordinates: {
+        latitude: 34.0522,
+        longitude: -118.2537
+      }
     },
     isActive: true
   },
   {
     code: 'CHI-CENTRAL-01',
     name: 'Chicago Branch',
-    address: '233 South Wacker Drive',
-    city: 'Chicago',
-    state: 'IL',
-    country: 'United States',
-    zipCode: '60606',
     capacity: 120,
     location: {
-      type: 'Point',
-      coordinates: [-87.6298, 41.8781]
+      address: '233 South Wacker Drive',
+      city: 'Chicago',
+      state: 'IL',
+      country: 'United States',
+      postalCode: '60606',
+      coordinates: {
+        latitude: 41.8781,
+        longitude: -87.6298
+      }
     },
     isActive: true
   },
   {
     code: 'SF-TECH-01',
     name: 'San Francisco Tech Hub',
-    address: '555 California Street',
-    city: 'San Francisco',
-    state: 'CA',
-    country: 'United States',
-    zipCode: '94104',
     capacity: 180,
     location: {
-      type: 'Point',
-      coordinates: [-122.4194, 37.7749]
+      address: '555 California Street',
+      city: 'San Francisco',
+      state: 'CA',
+      country: 'United States',
+      postalCode: '94104',
+      coordinates: {
+        latitude: 37.7749,
+        longitude: -122.4194
+      }
     },
     isActive: true
   }

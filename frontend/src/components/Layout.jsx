@@ -164,11 +164,11 @@ const Layout = ({ children }) => {
         <div className="footer-container">
           <p>&copy; 2025 Service Desk. Todos los derechos reservados.</p>
           <nav className="footer-links" aria-label="Enlaces del pie de página">
-            <a href="#privacy" title="Política de privacidad">Privacidad</a>
+            <Link to="/privacy" title="Política de privacidad">Privacidad</Link>
             <span className="separator" aria-hidden="true">•</span>
-            <a href="#terms" title="Términos y condiciones">Términos</a>
+            <Link to="/terms" title="Términos y condiciones">Términos</Link>
             <span className="separator" aria-hidden="true">•</span>
-            <a href="#contact" title="Información de contacto">Contacto</a>
+            <Link to="/contact" title="Información de contacto">Contacto</Link>
           </nav>
         </div>
       </footer>

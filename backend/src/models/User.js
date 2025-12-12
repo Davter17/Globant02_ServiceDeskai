@@ -47,7 +47,7 @@ const userSchema = new mongoose.Schema({
   phone: {
     type: String,
     trim: true,
-    match: [/^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/, 'Teléfono inválido']
+    match: [/^[\d\s\-\+\(\)]+$/, 'Teléfono inválido']
   },
 
   department: {
