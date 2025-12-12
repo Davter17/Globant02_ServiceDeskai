@@ -46,7 +46,7 @@ const Login = () => {
         <form onSubmit={handleSubmit} className="auth-form">
           {error && (
             <div className="alert alert-error">
-              {error}
+              {typeof error === 'string' ? error : error.message}
             </div>
           )}
 

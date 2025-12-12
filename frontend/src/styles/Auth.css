@@ -119,6 +119,15 @@
   color: #e53e3e;
   font-size: 0.85rem;
   margin-top: 0.25rem;
+  display: block;
+}
+
+.form-hint {
+  color: #718096;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  display: block;
+  font-style: italic;
 }
 
 .alert {

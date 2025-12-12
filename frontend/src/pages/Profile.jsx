@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { updateProfile } from '../redux/slices/authSlice';
+import { updateProfile, loadUser } from '../redux/slices/authSlice';
 import '../styles/Profile.css';
 
 const Profile = () => {
@@ -24,6 +24,14 @@ const Profile = () => {
 
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
+
+  // Load user data when component mounts if not already loaded
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token && !user) {
+      dispatch(loadUser());
+    }
+  }, [dispatch, user]);
 
   useEffect(() => {
     if (user) {

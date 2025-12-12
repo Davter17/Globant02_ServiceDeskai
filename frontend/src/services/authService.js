@@ -4,29 +4,29 @@ const authService = {
   // Login
   login: async (credentials) => {
     const response = await api.post('/auth/login', credentials);
-    const { token, refreshToken, user } = response.data;
+    const { user, tokens } = response.data.data;
     
     // Guardar tokens en localStorage
-    localStorage.setItem('token', token);
-    if (refreshToken) {
-      localStorage.setItem('refreshToken', refreshToken);
+    localStorage.setItem('token', tokens.accessToken);
+    if (tokens.refreshToken) {
+      localStorage.setItem('refreshToken', tokens.refreshToken);
     }
     
-    return { user, token };
+    return { user, token: tokens.accessToken };
   },
 
   // Register
   register: async (userData) => {
     const response = await api.post('/auth/register', userData);
-    const { token, refreshToken, user } = response.data;
+    const { user, tokens } = response.data.data;
     
     // Guardar tokens en localStorage
-    localStorage.setItem('token', token);
-    if (refreshToken) {
-      localStorage.setItem('refreshToken', refreshToken);
+    localStorage.setItem('token', tokens.accessToken);
+    if (tokens.refreshToken) {
+      localStorage.setItem('refreshToken', tokens.refreshToken);
     }
     
-    return { user, token };
+    return { user, token: tokens.accessToken };
   },
 
   // Logout
@@ -45,13 +45,13 @@ const authService = {
   // Get current user
   getCurrentUser: async () => {
     const response = await api.get('/auth/me');
-    return response.data.user;
+    return response.data.data.user;
   },
 
   // Update profile
   updateProfile: async (profileData) => {
     const response = await api.put('/auth/profile', profileData);
-    return response.data.user;
+    return response.data.data.user;
   },
 
   // Refresh token
@@ -62,10 +62,11 @@ const authService = {
     }
     
     const response = await api.post('/auth/refresh', { refreshToken });
-    const { token: newToken } = response.data;
+    const { accessToken, refreshToken: newRefreshToken } = response.data.data.tokens;
     
-    localStorage.setItem('token', newToken);
-    return newToken;
+    localStorage.setItem('token', accessToken);
+    localStorage.setItem('refreshToken', newRefreshToken);
+    return accessToken;
   },
 
   // Check if user is authenticated

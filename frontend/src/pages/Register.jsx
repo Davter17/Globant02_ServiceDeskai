@@ -36,20 +36,33 @@ const Register = () => {
   const validateForm = () => {
     const errors = {};
 
-    if (formData.name.length < 3) {
-      errors.name = 'El nombre debe tener al menos 3 caracteres';
+    // Validar nombre (mínimo 2 caracteres, solo letras y espacios)
+    if (formData.name.length < 2) {
+      errors.name = 'El nombre debe tener al menos 2 caracteres';
+    } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(formData.name)) {
+      errors.name = 'El nombre solo puede contener letras y espacios';
     }
 
+    // Validar email
     if (!/\S+@\S+\.\S+/.test(formData.email)) {
       errors.email = 'Email inválido';
     }
 
+    // Validar contraseña (mínimo 6 caracteres, al menos una mayúscula, minúscula y número)
     if (formData.password.length < 6) {
       errors.password = 'La contraseña debe tener al menos 6 caracteres';
+    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+      errors.password = 'La contraseña debe contener al menos una mayúscula, una minúscula y un número';
     }
 
+    // Validar confirmación de contraseña
     if (formData.password !== formData.confirmPassword) {
       errors.confirmPassword = 'Las contraseñas no coinciden';
+    }
+
+    // Validar teléfono (opcional, pero si se proporciona debe ser válido)
+    if (formData.phone && !/^[\d\s\-\+\(\)]+$/.test(formData.phone)) {
+      errors.phone = 'Formato de teléfono inválido';
     }
 
     setValidationErrors(errors);
@@ -71,6 +84,15 @@ const Register = () => {
       }
     } catch (err) {
       console.error('Registration failed:', err);
+      
+      // Manejar errores de validación del backend
+      if (err.errors && Array.isArray(err.errors)) {
+        const backendErrors = {};
+        err.errors.forEach(error => {
+          backendErrors[error.field] = error.message;
+        });
+        setValidationErrors(backendErrors);
+      }
     }
   };
 
@@ -86,7 +108,7 @@ const Register = () => {
         <form onSubmit={handleSubmit} className="auth-form">
           {error && (
             <div className="alert alert-error">
-              {error}
+              {typeof error === 'string' ? error : error.message}
             </div>
           )}
 
@@ -135,6 +157,9 @@ const Register = () => {
               placeholder="+34 600 000 000"
               autoComplete="tel"
             />
+            {validationErrors.phone && (
+              <span className="error-text">{validationErrors.phone}</span>
+            )}
           </div>
 
           <div className="form-group">
@@ -159,6 +184,9 @@ const Register = () => {
                 {showPassword ? '👁️' : '👁️‍🗨️'}
               </button>
             </div>
+            <small className="form-hint">
+              Mínimo 6 caracteres, debe incluir mayúsculas, minúsculas y números
+            </small>
             {validationErrors.password && (
               <span className="error-text">{validationErrors.password}</span>
             )}

@@ -17,7 +17,11 @@ export const login = createAsyncThunk(
       const response = await authService.login(credentials);
       return response;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Error al iniciar sesión');
+      // Pasar toda la información de error, incluyendo errores de validación
+      return rejectWithValue({
+        message: error.response?.data?.message || 'Error al iniciar sesión',
+        errors: error.response?.data?.errors || null
+      });
     }
   }
 );
@@ -29,7 +33,11 @@ export const register = createAsyncThunk(
       const response = await authService.register(userData);
       return response;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Error al registrar usuario');
+      // Pasar toda la información de error, incluyendo errores de validación
+      return rejectWithValue({
+        message: error.response?.data?.message || 'Error al registrar usuario',
+        errors: error.response?.data?.errors || null
+      });
     }
   }
 );
