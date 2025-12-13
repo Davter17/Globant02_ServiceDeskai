@@ -12,20 +12,77 @@
 
 ---
 
+## 🚀 Inicio Rápido
+
+### Requisitos Previos
+- **Docker** y **Docker Compose** instalados
+- **Git** instalado
+
+### Pasos para Ejecutar el Proyecto
+
+#### 1. Clonar el repositorio
+```bash
+git clone https://github.com/Davter17/Globant02_ServiceDeskai.git
+cd Globant02_ServiceDeskai
+```
+
+#### 2. Iniciar los contenedores Docker
+```bash
+docker-compose up
+```
+
+> 💡 **Nota**: La primera vez puede tardar varios minutos mientras se descargan las imágenes y se construyen los contenedores.
+
+#### 3. En otra terminal, cargar datos de prueba
+```bash
+make seed
+```
+
+O alternativamente:
+```bash
+docker-compose exec backend npm run seed
+```
+
+#### 4. Acceder a la aplicación
+
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:5000
+- **API Docs (Swagger)**: http://localhost:5000/api-docs
+
+### 👥 Usuarios de Prueba
+
+Después de ejecutar `make seed`, puedes iniciar sesión con:
+
+| Rol | Email | Password |
+|-----|-------|----------|
+| **Administrador** | `admin@test.com` | `Admin123!` |
+| **Service Desk** | `servicedesk@test.com` | `Service123!` |
+| **Usuario** | `user@test.com` | `User123!` |
+
+### 🛑 Detener el proyecto
+
+```bash
+docker-compose down
+```
+
+Para eliminar también los volúmenes (datos de BD):
+```bash
+docker-compose down -v
+```
+
+---
+
 ## 📋 Tabla de Contenido
 
+- [Inicio Rápido](#-inicio-rápido)
 - [Características](#-características)
-- [Demo](#-demo)
 - [Tecnologías](#-tecnologías)
-- [Requisitos](#-requisitos)
-- [Instalación Rápida](#-instalación-rápida)
-- [Documentación](#-documentación)
-- [Uso](#-uso)
+- [Comandos Útiles](#-comandos-útiles)
+- [Usuarios Adicionales](#-usuarios-adicionales)
 - [Testing](#-testing)
-- [Deployment](#-deployment)
+- [Desarrollo Local sin Docker](#-desarrollo-local-sin-docker)
 - [Arquitectura](#-arquitectura)
-- [Contribución](#-contribución)
-- [Licencia](#-licencia)
+- [Deployment](#-deployment)
 
 ---
 
@@ -46,32 +103,32 @@
 ### 🤖 Análisis de Imágenes con IA
 - Reconocimiento automático de objetos
 - Etiquetado inteligente de imágenes
-- Integración con Pollinations.ai
+- Integración con Pollinations.ai, Google Vision y Azure
 - Análisis visual de problemas reportados
 
 ### 💬 Chat en Tiempo Real
 - Socket.io para comunicación instantánea
 - Chat entre usuarios y service desk
-- Notificaciones en tiempo real
+- Typing indicators y usuarios online
 - Historial persistente de conversaciones
 
 ### 📱 Progressive Web App (PWA)
 - Instalable en dispositivos móviles
 - Funcionamiento offline
-- Notificaciones push
+- Service Worker con cache strategies
 - Experiencia nativa
 
 ### 🎨 Interfaz Moderna
 - Dark Mode completo
 - Diseño responsive (Mobile-first)
-- Accesibilidad WCAG AA
+- Accesibilidad WCAG 2.1 AA compliant
 - Animaciones fluidas
 
-### 📊 Dashboard y Estadísticas
+### �� Dashboard y Estadísticas
 - Métricas en tiempo real
-- Gráficos interactivos
+- Gráficos interactivos con barras de progreso
 - Reportes por categoría, prioridad y estado
-- Historial completo con timeline
+- Panel de administración avanzado
 
 ### 🔒 Seguridad Avanzada
 - Express-validator para backend
@@ -79,27 +136,7 @@
 - Sanitización de inputs (XSS, NoSQL injection)
 - Content Security Policy (CSP)
 - Rate limiting
-- HTTPS en producción
-
----
-
-## 🎥 Demo
-
-### Credenciales de Prueba
-
-| Rol | Email | Password |
-|-----|-------|----------|
-| **Admin** | admin@globant.com | AdminGlobant2024! |
-| **ServiceDesk** | servicedesk@globant.com | ServiceDesk2024! |
-| **User** | juan.perez@globant.com | UserGlobant2024! |
-| **User** | ana.martinez@globant.com | UserGlobant2024! |
-| **User** | luis.fernandez@globant.com | UserGlobant2024! |
-
-### Capturas de Pantalla
-
-```
-[Aquí irían screenshots de la aplicación]
-```
+- Helmet security headers
 
 ---
 
@@ -110,246 +147,216 @@
 - **Express.js** 4.x - Framework web
 - **MongoDB** 7.x - Base de datos NoSQL
 - **Mongoose** 8.x - ODM para MongoDB
-- **JWT** - Autenticación
-- **Socket.io** - WebSockets
+- **JWT** - Autenticación y refresh tokens
+- **Socket.io** - WebSockets para chat en tiempo real
 - **Multer** - Upload de archivos
 - **Bcrypt** - Hashing de contraseñas
-- **Express-validator** - Validación
-- **Helmet** - Seguridad HTTP
-- **Jest** - Testing
+- **Express-validator** - Validación de datos
+- **Helmet** - Seguridad HTTP headers
+- **Jest** - Testing framework
 
 ### Frontend
 - **React** 18.x - Biblioteca UI
 - **Redux Toolkit** - Estado global
-- **React Router** 6.x - Enrutamiento
-- **Axios** - Cliente HTTP
-- **Socket.io Client** - WebSockets
-- **React Hook Form** - Formularios
-- **Recharts** - Gráficos
-- **Leaflet** - Mapas
-- **Material-UI** - Componentes UI
+- **React Router** 6.x - Enrutamiento SPA
+- **Axios** - Cliente HTTP con interceptors
+- **Socket.io Client** - WebSockets cliente
+- **React Hook Form** - Gestión de formularios
+- **CSS3** - Estilos con variables CSS y animaciones
+- **PWA** - Service Worker + Manifest
 - **React Testing Library** - Testing
 
 ### DevOps
 - **Docker** - Contenedorización
-- **Docker Compose** - Orquestación
-- **Nginx** - Servidor web (producción)
-- **GitHub Actions** - CI/CD (opcional)
+- **Docker Compose** - Orquestación multi-contenedor
+- **Nginx** - Servidor web para producción
+- **Makefile** - Automatización de comandos
 
 ### IA y APIs
-- **Pollinations.ai** - Análisis de imágenes
-- **HTML5 Geolocation** - Ubicación
-- **Nodemailer** - Envío de emails
+- **Pollinations.ai** - Análisis de imágenes con IA
+- **Google Cloud Vision** - Reconocimiento de imágenes
+- **Azure Computer Vision** - Alternativa de análisis
+- **HTML5 Geolocation** - API de ubicación
+- **Nodemailer** - Envío de emails con templates HTML
 
 ---
 
-## 📋 Requisitos
+## 🔧 Comandos Útiles
 
-### Desarrollo
-- **Docker Desktop** 24+ (recomendado)
-  - O **Docker Engine** 24+ + **Docker Compose** 2.x
-- **Git** 2.x
-- **VS Code** (opcional, con extensión Dev Containers)
-
-### Desarrollo Local sin Docker
-- **Node.js** 20.x
-- **npm** 10.x
-- **MongoDB** 7.x
-
----
-
-## ⚡ Instalación Rápida
-
-### Con Docker (Recomendado)
+### Comandos con Makefile
 
 ```bash
-# 1. Clonar el repositorio
-git clone https://github.com/Davter17/Globant02_ServiceDeskai.git
-cd Globant02_ServiceDeskai
-
-# 2. Copiar variables de entorno
-cp .env.example .env
-cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env
-
-# 3. Iniciar contenedores
-docker-compose up
-
-# 4. Cargar datos de ejemplo (en otra terminal)
-docker-compose exec backend npm run seed
-
-# 5. Abrir en el navegador
-# Frontend: http://localhost:3000
-# Backend:  http://localhost:5000
-# API Docs: http://localhost:5000/api-docs
+make help           # Muestra todos los comandos disponibles
+make dev            # Inicia el proyecto (equivale a docker-compose up)
+make dev-build      # Reconstruye las imágenes y las inicia
+make dev-d          # Inicia en segundo plano (detached mode)
+make down           # Detiene los contenedores
+make down-v         # Detiene y elimina volúmenes (borra datos)
+make logs           # Muestra logs de todos los servicios
+make logs-backend   # Logs solo del backend
+make logs-frontend  # Logs solo del frontend
+make restart        # Reinicia todos los servicios
+make seed           # Carga datos de prueba
+make shell-backend  # Abre terminal en el contenedor del backend
+make clean          # Limpia contenedores, imágenes y volúmenes
 ```
 
-### Sin Docker
+### Comandos Docker directos
 
 ```bash
-# 1. Clonar el repositorio
-git clone https://github.com/Davter17/Globant02_ServiceDeskai.git
-cd Globant02_ServiceDeskai
+# Ver contenedores activos
+docker ps
 
-# 2. Backend
-cd backend
-cp .env.example .env
-npm install
-npm run seed    # Cargar datos de ejemplo
-npm run dev
+# Ver logs de un servicio específico
+docker-compose logs -f backend
+docker-compose logs -f frontend
+docker-compose logs -f mongodb
 
-# 3. Frontend (en otra terminal)
-cd frontend
-cp .env.example .env
-npm install
-npm start
+# Reiniciar un servicio
+docker-compose restart backend
 
-# 4. MongoDB debe estar corriendo en localhost:27017
+# Ejecutar comando en el backend
+docker-compose exec backend npm run <comando>
+
+# Acceder a MongoDB
+docker-compose exec mongodb mongosh
 ```
 
 ---
 
-## 📚 Documentación
+## 👥 Usuarios Adicionales
 
-### Documentación Completa
+El comando `make seed` crea múltiples usuarios para diferentes escenarios de prueba:
 
-- 📖 **[Guía para Principiantes](./GUIA_PARA_PRINCIPIANTES.md)** - Empieza aquí si eres nuevo
-- 🔐 **[Variables de Entorno](./ENV_BEST_PRACTICES.md)** - Configuración segura
-- 🧪 **[Guía de Testing](./backend/TESTING.md)** - Cómo ejecutar tests
-- 📊 **[Progreso del Proyecto](./PROGRESS.md)** - Estado actual
-- 🎯 **[Pasos Completados](./Steps)** - Historial de desarrollo
+### Administradores
+- **Admin Principal**: `admin@test.com` / `Admin123!`
+- **Carlos Rodriguez**: `admin@globant.com` / `AdminGlobant2024!`
 
-### API Documentation
+### Service Desk
+- **Service Desk Test**: `servicedesk@test.com` / `Service123!`
+- **Maria Garcia**: `servicedesk@globant.com` / `ServiceDesk2024!`
+- **Pedro Sanchez**: `pedro.sanchez@globant.com` / `Service123!`
 
-- 📄 **[OpenAPI/Swagger](./backend/docs/api-docs.yaml)** - Especificación completa de la API
-- 🌐 **Swagger UI**: http://localhost:5000/api-docs (cuando el servidor esté corriendo)
-
-### Resúmenes por Paso
-
-- ✅ [Paso 2 - Backend Base](./PASO_2_COMPLETADO.md)
-- ✅ [Paso 3 - Frontend Base](./PASO_3_COMPLETADO.md)
-- ✅ [Paso 4 - Perfiles de Usuario](./PASO_4_COMPLETADO.md)
-- ✅ [Paso 5 - Reportes con IA](./PASO_5_COMPLETADO.md)
-- ✅ [Paso 6 - Historial y Estados](./PASO_6_COMPLETADO.md)
-- ✅ [Paso 7 - Funcionalidades Adicionales](./PASO_7_COMPLETADO.md)
-- ✅ [Paso 8 - Optimización y Seguridad](./PASO_8_COMPLETADO.md)
-- ✅ [Paso 9 - Testing](./PASO_9_COMPLETADO.md)
-
----
-
-## 💻 Uso
-
-### Comandos Docker
-
-```bash
-# Desarrollo
-docker-compose up                    # Iniciar todos los servicios
-docker-compose up -d                 # Iniciar en background
-docker-compose up --build            # Rebuild e iniciar
-docker-compose down                  # Detener servicios
-docker-compose down -v               # Detener y eliminar volúmenes
-docker-compose logs -f               # Ver logs en tiempo real
-docker-compose logs -f backend       # Ver logs de un servicio
-
-# Producción
-docker-compose -f docker-compose.prod.yml up -d
-docker-compose -f docker-compose.prod.yml down
-```
-
-### Comandos Útiles con Makefile
-
-```bash
-make help              # Ver todos los comandos disponibles
-make dev               # Iniciar en modo desarrollo
-make dev-build         # Rebuild e iniciar
-make down              # Detener contenedores
-make logs              # Ver logs
-make status            # Estado de contenedores
-make restart           # Reiniciar servicios
-make clean             # Limpiar todo Docker
-make shell-backend     # Terminal en backend
-make shell-frontend    # Terminal en frontend
-make shell-mongo       # Terminal MongoDB
-```
-
-### Scripts del Backend
-
-```bash
-cd backend
-
-npm run dev            # Modo desarrollo con nodemon
-npm start              # Modo producción
-npm test               # Ejecutar tests con coverage
-npm run test:watch     # Tests en modo watch
-npm run test:unit      # Solo tests unitarios
-npm run test:integration # Solo tests de integración
-npm run seed           # Cargar datos de ejemplo
-npm run seed:clean     # Limpiar base de datos
-npm run lint           # Linter
-npm run lint:fix       # Fix automático de lint
-```
-
-### Scripts del Frontend
-
-```bash
-cd frontend
-
-npm start              # Modo desarrollo
-npm run build          # Build para producción
-npm test               # Ejecutar tests
-npm run test:coverage  # Tests con coverage
-npm run lint           # Linter
-npm run lint:fix       # Fix automático de lint
-```
+### Usuarios Finales
+- **Usuario Test**: `user@test.com` / `User123!`
+- **Juan Perez**: `juan.perez@globant.com` / `UserGlobant2024!`
+- **Ana Martinez**: `ana.martinez@globant.com` / `UserGlobant2024!`
+- **Luis Fernandez**: `luis.fernandez@globant.com` / `UserGlobant2024!`
+- **Sofia Lopez**: `sofia.lopez@globant.com` / `User123!`
+- **Miguel Torres**: `miguel.torres@globant.com` / `User123!`
+- **Laura Ramirez**: `laura.ramirez@globant.com` / `User123!`
 
 ---
 
 ## 🧪 Testing
 
-### Backend Testing
+### Backend Tests
 
-El proyecto incluye una suite completa de tests:
+```bash
+# Ejecutar todos los tests
+docker-compose exec backend npm test
+
+# Tests en modo watch
+docker-compose exec backend npm run test:watch
+
+# Coverage
+docker-compose exec backend npm run test:coverage
+```
+
+### Frontend Tests
+
+```bash
+# Ejecutar tests
+docker-compose exec frontend npm test
+
+# Coverage
+docker-compose exec frontend npm run test:coverage
+```
+
+---
+
+## 📦 Desarrollo Local sin Docker
+
+Si prefieres ejecutar el proyecto sin Docker:
+
+### Requisitos
+- Node.js 20.x
+- npm 10.x
+- MongoDB 7.x (instalado y ejecutándose)
+
+### Backend
 
 ```bash
 cd backend
-
-# Ejecutar todos los tests
-npm test
-
-# Tests con watch
-npm run test:watch
-
-# Solo tests unitarios
-npm run test:unit
-
-# Solo tests de integración
-npm run test:integration
-
-# Ver reporte de coverage
-xdg-open coverage/lcov-report/index.html
+cp .env.example .env
+npm install
+npm run seed    # Cargar datos de prueba
+npm run dev     # Puerto 5000
 ```
 
-### Coverage Actual
+### Frontend
+
+```bash
+cd frontend
+cp .env.example .env
+npm install
+npm start       # Puerto 3000
+```
+
+### MongoDB
+
+Necesitarás MongoDB instalado localmente en el puerto 27017, o modificar la conexión en `backend/.env`:
+
+```env
+MONGODB_URI=mongodb://localhost:27017/servicedesk
+```
+
+---
+
+## 🏗️ Arquitectura
+
+### Backend (Node.js + Express)
 
 ```
-Statements   : 85.5%
-Branches     : 78.2%
-Functions    : 82.3%
-Lines        : 84.8%
+backend/
+├── src/
+│   ├── config/          # Configuraciones (DB, Socket.io, Email)
+│   ├── controllers/     # Lógica de negocio
+│   ├── middleware/      # Auth, validators, security
+│   ├── models/          # Esquemas Mongoose (User, Report, Message)
+│   ├── routes/          # Endpoints API REST
+│   ├── utils/           # Utilidades (JWT, helpers)
+│   └── index.js         # Entry point
+├── uploads/             # Archivos subidos
+└── scripts/             # Seeds y utilidades
 ```
 
-### Tests Implementados
+### Frontend (React + Redux)
 
-- ✅ **Tests Unitarios** (370+ líneas)
-  - User Model (validación, hashing, tokens)
-  - JWT Utils (generación, verificación, seguridad)
-  
-- ✅ **Tests de Integración** (1,630+ líneas)
-  - Auth API (register, login, refresh, logout)
-  - Reports API (CRUD, assign, resolve, rate, stats)
-  - RBAC (permisos exhaustivos por rol)
+```
+frontend/
+├── public/
+│   ├── service-worker.js  # PWA Service Worker
+│   ├── manifest.json      # PWA Manifest
+│   └── offline.html       # Página offline
+├── src/
+│   ├── components/        # Componentes reutilizables
+│   ├── pages/             # Vistas/Páginas
+│   ├── redux/             # Store, slices, actions
+│   ├── services/          # API calls, Socket.io
+│   ├── hooks/             # Custom hooks
+│   ├── contexts/          # Context API (Theme)
+│   ├── styles/            # CSS files
+│   └── utils/             # Helpers
+```
 
-Ver [TESTING.md](./backend/TESTING.md) para más detalles.
+### Base de Datos (MongoDB)
+
+**Colecciones principales:**
+- `users` - Usuarios con roles (admin, servicedesk, user)
+- `reports` - Reportes/Tickets con geolocalización, imágenes, análisis IA
+- `messages` - Mensajes del chat en tiempo real
+- `offices` - Oficinas con ubicación geográfica
 
 ---
 
@@ -357,152 +364,81 @@ Ver [TESTING.md](./backend/TESTING.md) para más detalles.
 
 ### Producción con Docker
 
-1. **Configurar variables de entorno**
-
 ```bash
-cp .env.example .env
-# Editar .env con valores seguros de producción
+# Construir imágenes de producción
+docker-compose -f docker-compose.prod.yml build
+
+# Iniciar en producción
+docker-compose -f docker-compose.prod.yml up -d
+
+# Ver logs
+docker-compose -f docker-compose.prod.yml logs -f
 ```
 
-Variables importantes:
+### Variables de Entorno Importantes
+
+#### Backend (.env)
 ```env
-MONGO_ROOT_PASSWORD=<contraseña-segura>
-JWT_SECRET=<secret-key-muy-fuerte-min-32-chars>
-JWT_REFRESH_SECRET=<otro-secret-diferente>
-FRONTEND_URL=https://yourdomain.com
+NODE_ENV=production
+PORT=5000
+MONGODB_URI=mongodb://mongodb:27017/servicedesk
+JWT_SECRET=your-super-secret-key
+JWT_EXPIRE=15m
+JWT_REFRESH_SECRET=your-refresh-secret-key
+JWT_REFRESH_EXPIRE=7d
+FRONTEND_URL=http://localhost:3000
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-password
 ```
 
-2. **Iniciar en producción**
-
-```bash
-docker-compose -f docker-compose.prod.yml up -d
+#### Frontend (.env)
+```env
+REACT_APP_API_URL=http://localhost:5000
+REACT_APP_SOCKET_URL=http://localhost:5000
 ```
-
-3. **Verificar estado**
-
-```bash
-docker-compose -f docker-compose.prod.yml ps
-docker-compose -f docker-compose.prod.yml logs
-```
-
-### Con HTTPS (Nginx + Let's Encrypt)
-
-```bash
-# 1. Configurar SSL
-cd scripts
-./setup-ssl.sh yourdomain.com
-
-# 2. Iniciar con HTTPS
-docker-compose -f docker-compose.prod.yml up -d
-
-# 3. Renovar certificados (automático con cron)
-docker-compose -f docker-compose.prod.yml exec certbot certbot renew
-```
-
-### Variables de Entorno de Producción
-
-Ver `.env.example` para todas las variables disponibles.
-
-**⚠️ IMPORTANTE**: Nunca commitees archivos `.env` con valores reales!
 
 ---
 
-## 🏗️ Arquitectura
+## 📚 Documentación API
 
-### Diagrama de Componentes
+La documentación interactiva de la API está disponible en:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                         Frontend (React)                     │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │  Pages   │  │Components│  │  Redux   │  │ Services │   │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
-└────────────────────────┬────────────────────────────────────┘
-                         │ HTTP/WebSocket
-┌────────────────────────┴────────────────────────────────────┐
-│                     Backend (Node.js/Express)               │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │  Routes  │  │Controllers│ │Middleware│  │  Utils   │   │
-│  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
-└────────────────────────┬────────────────────────────────────┘
-                         │ Mongoose ODM
-┌────────────────────────┴────────────────────────────────────┐
-│                       MongoDB Database                       │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐                  │
-│  │  Users   │  │ Reports  │  │ Offices  │                  │
-│  └──────────┘  └──────────┘  └──────────┘                  │
-└─────────────────────────────────────────────────────────────┘
-```
+**Swagger UI**: http://localhost:5000/api-docs
 
-### Estructura de Directorios
+### Endpoints Principales
 
-```
-project/
-├── backend/                    # API Node.js
-│   ├── src/
-│   │   ├── config/             # Configuraciones (DB, socket)
-│   │   ├── models/             # Modelos Mongoose
-│   │   ├── routes/             # Rutas API
-│   │   ├── controllers/        # Lógica de negocio
-│   │   ├── middleware/         # Auth, validación, RBAC
-│   │   ├── utils/              # Helpers, JWT, uploads
-│   │   └── index.js            # Entry point
-│   ├── scripts/
-│   │   └── seed.js             # Datos de ejemplo
-│   ├── __tests__/              # Tests (Jest)
-│   ├── uploads/                # Archivos subidos
-│   ├── docs/
-│   │   └── api-docs.yaml       # OpenAPI spec
-│   ├── Dockerfile
-│   ├── package.json
-│   └── .env.example
-│
-├── frontend/                   # App React
-│   ├── public/
-│   │   ├── manifest.json       # PWA manifest
-│   │   └── service-worker.js   # Service Worker
-│   ├── src/
-│   │   ├── components/         # Componentes reutilizables
-│   │   ├── pages/              # Páginas principales
-│   │   ├── redux/              # Store, slices, actions
-│   │   ├── services/           # API clients
-│   │   ├── utils/              # Helpers
-│   │   ├── styles/             # CSS/SCSS
-│   │   ├── App.js
-│   │   └── index.js
-│   ├── Dockerfile
-│   ├── nginx.conf              # Configuración Nginx
-│   ├── package.json
-│   └── .env.example
-│
-├── docs/                       # Documentación
-│   ├── README.md
-│   ├── GUIA_PARA_PRINCIPIANTES.md
-│   ├── ENV_BEST_PRACTICES.md
-│   └── PROGRESS.md
-│
-├── nginx/                      # Configuración Nginx (prod)
-│   ├── nginx.conf
-│   └── conf.d/
-│
-├── scripts/                    # Scripts de utilidad
-│   └── setup-ssl.sh            # Configurar SSL
-│
-├── docker-compose.yml          # Docker Compose (dev)
-├── docker-compose.prod.yml     # Docker Compose (prod)
-├── Makefile                    # Comandos rápidos
-├── .env.example                # Variables de entorno
-├── .gitignore
-└── README.md                   # Este archivo
-```
+#### Autenticación
+- `POST /api/auth/register` - Registro de usuario
+- `POST /api/auth/login` - Iniciar sesión
+- `POST /api/auth/refresh` - Renovar token
+- `GET /api/auth/me` - Usuario actual
+
+#### Reportes
+- `GET /api/reports` - Listar reportes
+- `POST /api/reports` - Crear reporte (con geolocalización + imágenes)
+- `GET /api/reports/:id` - Obtener reporte
+- `PUT /api/reports/:id` - Actualizar reporte
+- `DELETE /api/reports/:id` - Eliminar reporte
+- `PATCH /api/reports/:id/assign` - Asignar reporte (servicedesk)
+- `PATCH /api/reports/:id/resolve` - Resolver reporte (servicedesk)
+- `PATCH /api/reports/:id/close` - Cerrar reporte (admin)
+
+#### Usuarios (Admin)
+- `GET /api/users` - Listar usuarios
+- `PUT /api/users/:id/role` - Cambiar rol
+- `DELETE /api/users/:id` - Eliminar usuario
+
+#### Chat (Socket.io)
+- `join:report` - Unirse al chat de un reporte
+- `leave:report` - Salir del chat
+- `message:send` - Enviar mensaje
+- `typing:start` / `typing:stop` - Indicadores de escritura
 
 ---
 
 ## 🤝 Contribución
-
-Este es un proyecto educativo de Globant Piscine. 
-
-Si deseas contribuir:
 
 1. Fork el proyecto
 2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
@@ -510,78 +446,28 @@ Si deseas contribuir:
 4. Push a la rama (`git push origin feature/AmazingFeature`)
 5. Abre un Pull Request
 
-### Estándares de Código
-
-- **Backend**: ESLint con reglas de Node.js
-- **Frontend**: ESLint con reglas de React
-- **Testing**: Jest con coverage mínimo 70%
-- **Commits**: Conventional Commits
-
 ---
 
 ## 📄 Licencia
 
-Este proyecto está licenciado bajo la Licencia MIT - ver el archivo [LICENSE](./LICENSE) para más detalles.
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
 
 ---
 
-## 👥 Autores
+## 👨‍💻 Autor
 
-- **Service Desk Team** - *Desarrollo inicial* - Globant Piscine
+**Davter17**
+- GitHub: [@Davter17](https://github.com/Davter17)
+- Proyecto: [Service Desk AI](https://github.com/Davter17/Globant02_ServiceDeskai)
 
 ---
 
 ## 🙏 Agradecimientos
 
-- Globant Piscine por la oportunidad
-- Instructores y mentores
-- Comunidad open source
+- **Globant** - Por la oportunidad de desarrollar este proyecto
+- **Comunidad Open Source** - Por las increíbles herramientas y librerías
+- **Pollinations.ai** - Por el servicio de análisis de imágenes con IA
 
 ---
 
-## 📞 Soporte
-
-¿Problemas o preguntas?
-
-- 📧 Email: support@servicedesk.com
-- 🐛 Issues: [GitHub Issues](https://github.com/Davter17/Globant02_ServiceDeskai/issues)
-- 📖 Docs: [Documentación Completa](./docs/)
-
----
-
-## 🎯 Roadmap
-
-### ✅ Completado
-- [x] Sistema de autenticación JWT con refresh tokens
-- [x] RBAC con 3 roles (Admin, ServiceDesk, User)
-- [x] CRUD completo de reportes
-- [x] Geolocalización con mapas
-- [x] Análisis de imágenes con IA
-- [x] Chat en tiempo real con Socket.io
-- [x] PWA completa (offline, installable)
-- [x] Dark Mode
-- [x] Accesibilidad WCAG AA
-- [x] Testing completo (85%+ coverage)
-- [x] Documentación exhaustiva
-- [x] Docker y Docker Compose
-- [x] Seguridad avanzada (CSP, rate limiting)
-
-### 🔮 Futuro
-- [ ] Notificaciones push
-- [ ] Integración con Slack/Teams
-- [ ] Dashboard analytics avanzado
-- [ ] Export de reportes (PDF, Excel)
-- [ ] Multi-idioma (i18n)
-- [ ] Modo offline mejorado
-- [ ] API GraphQL
-- [ ] Microservicios
-
----
-
-<div align="center">
-
-**⭐ Si este proyecto te fue útil, dale una estrella en GitHub ⭐**
-
-Hecho con ❤️ por el equipo de Service Desk
-
-</div>
+**Desarrollado con ❤️ para Globant Piscine 2024**

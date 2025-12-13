@@ -378,7 +378,8 @@ officeSchema.index({ code: 1 }, { unique: true });
 officeSchema.index({ 'location.city': 1, 'location.country': 1 });
 
 // Índice geoespacial para coordenadas
-officeSchema.index({ 'location.coordinates': '2dsphere' });
+// NOTA: Comentado temporalmente - el formato de coordenadas necesita ser GeoJSON
+// officeSchema.index({ 'location.coordinates': '2dsphere' });
 
 // =====================================
 // EXPORTAR MODELO

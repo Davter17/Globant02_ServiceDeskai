@@ -51,6 +51,20 @@ shell-frontend: ## Abre una shell en el contenedor del frontend
 shell-db: ## Abre mongosh en el contenedor de MongoDB
 	docker exec -it servicedesk-mongodb mongosh -u admin -p admin123
 
+seed: ## Crea usuarios y datos de prueba en la base de datos
+	docker exec -it servicedesk-backend npm run seed
+
+seed-clean: ## Limpia la base de datos y crea datos de prueba
+	docker exec -it servicedesk-backend npm run seed:clean
+	docker exec -it servicedesk-backend npm run seed
+
+seed-local: ## Crea datos de prueba (sin Docker)
+	cd backend && npm run seed
+
+seed-clean-local: ## Limpia y crea datos de prueba (sin Docker)
+	cd backend && npm run seed:clean
+	cd backend && npm run seed
+
 clean: ## Limpia contenedores, imágenes y volúmenes no utilizados
 	docker system prune -f
 

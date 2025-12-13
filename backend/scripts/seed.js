@@ -32,13 +32,34 @@ const log = {
 
 // Datos de usuarios iniciales
 const users = [
+  // ADMINISTRADORES
+  {
+    name: 'Admin Principal',
+    email: 'admin@test.com',
+    password: 'Admin123!',
+    role: 'admin',
+    phone: '5551234567',
+    department: 'IT Administration',
+    isActive: true
+  },
   {
     name: 'Carlos Rodriguez',
     email: 'admin@globant.com',
     password: 'AdminGlobant2024!',
     role: 'admin',
-    phone: '5551234567',
+    phone: '5551234568',
     department: 'IT Administration',
+    isActive: true
+  },
+  
+  // SERVICE DESK
+  {
+    name: 'Service Desk Test',
+    email: 'servicedesk@test.com',
+    password: 'Service123!',
+    role: 'servicedesk',
+    phone: '5552345678',
+    department: 'Technical Support',
     isActive: true
   },
   {
@@ -46,8 +67,28 @@ const users = [
     email: 'servicedesk@globant.com',
     password: 'ServiceDesk2024!',
     role: 'servicedesk',
-    phone: '5552345678',
+    phone: '5552345679',
     department: 'Technical Support',
+    isActive: true
+  },
+  {
+    name: 'Pedro Sanchez',
+    email: 'pedro.sanchez@globant.com',
+    password: 'Service123!',
+    role: 'servicedesk',
+    phone: '5552345680',
+    department: 'Technical Support',
+    isActive: true
+  },
+  
+  // USUARIOS REGULARES
+  {
+    name: 'Usuario Test',
+    email: 'user@test.com',
+    password: 'User123!',
+    role: 'user',
+    phone: '5553456789',
+    department: 'General',
     isActive: true
   },
   {
@@ -55,7 +96,7 @@ const users = [
     email: 'juan.perez@globant.com',
     password: 'UserGlobant2024!',
     role: 'user',
-    phone: '5553456789',
+    phone: '5553456790',
     department: 'Development',
     isActive: true
   },
@@ -75,6 +116,33 @@ const users = [
     role: 'user',
     phone: '5555678901',
     department: 'QA',
+    isActive: true
+  },
+  {
+    name: 'Sofia Lopez',
+    email: 'sofia.lopez@globant.com',
+    password: 'User123!',
+    role: 'user',
+    phone: '5556789012',
+    department: 'Marketing',
+    isActive: true
+  },
+  {
+    name: 'Miguel Torres',
+    email: 'miguel.torres@globant.com',
+    password: 'User123!',
+    role: 'user',
+    phone: '5557890123',
+    department: 'Sales',
+    isActive: true
+  },
+  {
+    name: 'Laura Ramirez',
+    email: 'laura.ramirez@globant.com',
+    password: 'User123!',
+    role: 'user',
+    phone: '5558901234',
+    department: 'HR',
     isActive: true
   }
 ];
@@ -323,16 +391,29 @@ async function seedOffices() {
   try {
     log.info('Seeding offices...');
     
-    const createdOffices = await Office.insertMany(offices);
+    // Crear oficinas una por una para manejar errores individualmente
+    const createdOffices = [];
     
-    createdOffices.forEach(office => {
-      log.success(`Created office: ${office.name} (${office.code})`);
-    });
+    for (const officeData of offices) {
+      try {
+        const office = await Office.create(officeData);
+        createdOffices.push(office);
+        log.success(`Created office: ${office.name} (${office.code})`);
+      } catch (error) {
+        log.warning(`Skipped office ${officeData.name}: ${error.message}`);
+        // Continuar con las demás oficinas
+      }
+    }
+    
+    if (createdOffices.length === 0) {
+      log.warning('No offices were created (geolocation index issue)');
+    }
     
     return createdOffices;
   } catch (error) {
     log.error(`Error seeding offices: ${error.message}`);
-    throw error;
+    // No lanzar error, permitir que continúe con reportes
+    return [];
   }
 }
 
@@ -355,30 +436,56 @@ async function seedReports(users, offices) {
 
 // Mostrar resumen
 function showSummary(users, offices, reports) {
-  console.log('\n' + '='.repeat(50));
-  log.success('Database seeded successfully!');
-  console.log('='.repeat(50));
+  console.log('\n' + '='.repeat(70));
+  log.success('🎉 Database seeded successfully!');
+  console.log('='.repeat(70));
   
   console.log('\n📊 Summary:');
-  console.log(`   Users:    ${users.length}`);
-  console.log(`   Offices:  ${offices.length}`);
-  console.log(`   Reports:  ${reports.length}`);
+  console.log(`   👥 Users:    ${users.length} created`);
+  console.log(`   🏢 Offices:  ${offices.length} created`);
+  console.log(`   📋 Reports:  ${reports.length} created`);
   
-  console.log('\n👤 Login Credentials:');
-  console.log('   ┌─────────────┬──────────────────────────────┬──────────────┐');
-  console.log('   │ Role        │ Email                        │ Password     │');
-  console.log('   ├─────────────┼──────────────────────────────┼──────────────┤');
-  console.log('   │ Admin       │ admin@servicedesk.com        │ Admin123!    │');
-  console.log('   │ ServiceDesk │ servicedesk@servicedesk.com  │ Service123!  │');
-  console.log('   │ User        │ user@servicedesk.com         │ User123!     │');
-  console.log('   └─────────────┴──────────────────────────────┴──────────────┘');
+  console.log('\n� Quick Access Credentials (Para pruebas):');
+  console.log('   ┌──────────────┬─────────────────────────┬───────────────┐');
+  console.log('   │ Role         │ Email                   │ Password      │');
+  console.log('   ├──────────────┼─────────────────────────┼───────────────┤');
+  console.log('   │ 👨‍💼 Admin      │ admin@test.com          │ Admin123!     │');
+  console.log('   │ 🎫 ServiceDesk│ servicedesk@test.com    │ Service123!   │');
+  console.log('   │ 👤 User       │ user@test.com           │ User123!      │');
+  console.log('   └──────────────┴─────────────────────────┴───────────────┘');
   
-  console.log('\n🌐 Access the application:');
-  console.log('   Frontend: http://localhost:3000');
-  console.log('   Backend:  http://localhost:5000');
-  console.log('   API Docs: http://localhost:5000/api-docs');
+  console.log('\n📋 Todos los usuarios disponibles:');
   
-  console.log('\n');
+  // Agrupar usuarios por rol
+  const adminUsers = users.filter(u => u.role === 'admin');
+  const servicedeskUsers = users.filter(u => u.role === 'servicedesk');
+  const regularUsers = users.filter(u => u.role === 'user');
+  
+  console.log(`\n   👨‍💼 Administradores (${adminUsers.length}):`);
+  adminUsers.forEach(u => {
+    console.log(`      • ${u.email.padEnd(30)} - ${u.name}`);
+  });
+  
+  console.log(`\n   🎫 Service Desk (${servicedeskUsers.length}):`);
+  servicedeskUsers.forEach(u => {
+    console.log(`      • ${u.email.padEnd(30)} - ${u.name}`);
+  });
+  
+  console.log(`\n   👤 Usuarios (${regularUsers.length}):`);
+  regularUsers.forEach(u => {
+    console.log(`      • ${u.email.padEnd(30)} - ${u.name}`);
+  });
+  
+  console.log('\n🌐 Acceder a la aplicación:');
+  console.log('   Frontend:  http://localhost:3000');
+  console.log('   Backend:   http://localhost:5000');
+  console.log('   API Docs:  http://localhost:5000/api-docs');
+  
+  console.log('\n📖 Documentación:');
+  console.log('   Ver USUARIOS_PRUEBA.md para más información');
+  console.log('   Ver INICIO_RAPIDO.md para guía de inicio\n');
+  
+  console.log('='.repeat(70) + '\n');
 }
 
 // Main function

@@ -133,6 +133,7 @@ const Layout = ({ children }) => {
 
           {!isAuthenticated && (
             <nav className="navbar-nav" role="navigation" aria-label="Navegación de autenticación">
+              <ThemeToggle />
               <ul className="nav-links" role="menubar">
                 <li role="none">
                   <Link to="/login" className="nav-link" role="menuitem">
