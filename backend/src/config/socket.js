@@ -151,7 +151,7 @@ const initializeSocket = (httpServer) => {
           sender: socket.user._id,
           content: content.trim(),
           attachments: attachments || [],
-          isRead: false
+          read: false
         });
 
         // Populate sender info
@@ -204,10 +204,10 @@ const initializeSocket = (httpServer) => {
         await Message.updateMany(
           {
             _id: { $in: messageIds },
-            sender: { $ne: socket.user._id } // No marcar propios mensajes
+            sender: { $ne: socket.user._id }
           },
           {
-            isRead: true,
+            read: true,
             readAt: new Date()
           }
         );

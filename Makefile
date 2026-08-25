@@ -1,91 +1,112 @@
-.PHONY: help dev prod build up down logs clean restart
+.PHONY: up down build restart logs clean help dev prod seed setup status install
 
-help: ## Muestra esta ayuda
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+# Comando por defecto
+all: up
 
-dev: ## Inicia el entorno de desarrollo
-	docker-compose up
+# Levantar el proyecto en segundo plano
+up:
+	@echo "🚀 Levantando el proyecto..."
+	@docker-compose up -d --build
+	@echo "✅ Listo!"
+	@echo "   Frontend: http://localhost:3001"
+	@echo "   Backend:  http://localhost:5000"
 
-dev-build: ## Inicia el entorno de desarrollo reconstruyendo las imágenes
-	docker-compose up --build
+# Levantar el proyecto con logs visibles
+dev:
+	@echo "🚀 Levantando el proyecto en modo desarrollo..."
+	@echo "   Frontend: http://localhost:3001"
+	@echo "   Backend:  http://localhost:5000"
+	@docker-compose up --build
 
-dev-d: ## Inicia el entorno de desarrollo en segundo plano
-	docker-compose up -d
+# Bajar el proyecto
+down:
+	@echo "🛑 Bajando el proyecto..."
+	@docker-compose down
 
-prod: ## Inicia el entorno de producción
-	docker-compose -f docker-compose.prod.yml up -d --build
+# Reconstruir desde cero
+build:
+	@echo "🔨 Reconstruyendo el proyecto..."
+	@docker-compose build --no-cache
 
-down: ## Detiene todos los contenedores
-	docker-compose down
+# Reiniciar el proyecto
+restart: down up
+	@echo "🔄 Proyecto reiniciado"
 
-down-v: ## Detiene todos los contenedores y elimina volúmenes
-	docker-compose down -v
+# Ver logs
+logs:
+	@echo "📋 Mostrando logs..."
+	@docker-compose logs -f
 
-logs: ## Muestra los logs de todos los servicios
-	docker-compose logs -f
+# Logs solo del backend
+logs-backend:
+	@docker-compose logs -f backend
 
-logs-backend: ## Muestra los logs del backend
-	docker-compose logs -f backend
+# Logs solo del frontend
+logs-frontend:
+	@docker-compose logs -f frontend
 
-logs-frontend: ## Muestra los logs del frontend
-	docker-compose logs -f frontend
+# Limpiar contenedores, volúmenes e imágenes
+clean:
+	@echo "🧹 Limpiando contenedores, volúmenes e imágenes..."
+	@docker-compose down -v --rmi all
 
-logs-db: ## Muestra los logs de MongoDB
-	docker-compose logs -f mongodb
+# Cargar datos de prueba
+seed:
+	@echo "🌱 Cargando datos de prueba..."
+	@docker exec -it servicedesk-backend npm run seed
+	@echo "✅ Datos de prueba cargados"
 
-restart: ## Reinicia todos los servicios
-	docker-compose restart
-
-restart-backend: ## Reinicia el backend
-	docker-compose restart backend
-
-restart-frontend: ## Reinicia el frontend
-	docker-compose restart frontend
-
-shell-backend: ## Abre una shell en el contenedor del backend
-	docker exec -it servicedesk-backend sh
-
-shell-frontend: ## Abre una shell en el contenedor del frontend
-	docker exec -it servicedesk-frontend sh
-
-shell-db: ## Abre mongosh en el contenedor de MongoDB
-	docker exec -it servicedesk-mongodb mongosh -u admin -p admin123
-
-seed: ## Crea usuarios y datos de prueba en la base de datos
-	docker exec -it servicedesk-backend npm run seed
-
-seed-clean: ## Limpia la base de datos y crea datos de prueba
-	docker exec -it servicedesk-backend npm run seed:clean
-	docker exec -it servicedesk-backend npm run seed
-
-seed-local: ## Crea datos de prueba (sin Docker)
-	cd backend && npm run seed
-
-seed-clean-local: ## Limpia y crea datos de prueba (sin Docker)
-	cd backend && npm run seed:clean
-	cd backend && npm run seed
-
-clean: ## Limpia contenedores, imágenes y volúmenes no utilizados
-	docker system prune -f
-
-clean-all: ## Limpia TODO (¡CUIDADO! Elimina todos los datos)
-	docker system prune -a --volumes -f
-
-install-backend: ## Instala dependencias del backend
-	cd backend && npm install
-
-install-frontend: ## Instala dependencias del frontend
-	cd frontend && npm install
-
-install: install-backend install-frontend ## Instala todas las dependencias
-
-setup: ## Setup inicial del proyecto
+# Setup inicial
+setup:
 	@echo "📦 Configurando proyecto..."
 	@cp -n backend/.env.example backend/.env 2>/dev/null || true
-	@cp -n frontend/.env.example frontend/.env 2>/dev/null || true
 	@echo "✅ Archivos .env creados"
-	@echo "⚙️  Por favor, edita los archivos .env con tus configuraciones"
-	@echo "🚀 Después ejecuta: make dev"
+	@echo "⚠️  Edita los archivos .env con tus configuraciones"
+	@echo "🚀 Después ejecuta: make up"
 
-status: ## Muestra el estado de los contenedores
-	docker-compose ps
+# Instalar dependencias
+install:
+	@echo "📦 Instalando dependencias..."
+	@cd backend && npm install
+	@cd frontend && npm install
+	@echo "✅ Dependencias instaladas"
+
+# Producción
+prod:
+	@echo "🚀 Construyendo y levantando producción..."
+	@docker-compose -f docker-compose.prod.yml up --build -d
+	@echo "✅ Producción lista en http://localhost:80"
+
+# Bajar producción
+prod-down:
+	@echo "🛑 Bajando producción..."
+	@docker-compose -f docker-compose.prod.yml down
+
+# Ver logs de producción
+prod-logs:
+	@echo "📋 Mostrando logs de producción..."
+	@docker-compose -f docker-compose.prod.yml logs -f
+
+# Estado de los contenedores
+status:
+	@echo "📊 Estado de los contenedores:"
+	@docker-compose ps
+
+# Ayuda
+help:
+	@echo "📖 Comandos disponibles:"
+	@echo "  make up         - Levantar el proyecto en segundo plano"
+	@echo "  make dev        - Levantar el proyecto con logs visibles"
+	@echo "  make down       - Bajar el proyecto"
+	@echo "  make build      - Reconstruir el proyecto desde cero"
+	@echo "  make restart    - Reiniciar el proyecto"
+	@echo "  make logs       - Ver logs del proyecto"
+	@echo "  make clean      - Limpiar contenedores, volúmenes e imágenes"
+	@echo "  make seed       - Cargar datos de prueba en MongoDB"
+	@echo "  make setup      - Setup inicial del proyecto"
+	@echo "  make install    - Instalar dependencias"
+	@echo "  make prod       - Build y levantar producción"
+	@echo "  make prod-down  - Bajar el contenedor de producción"
+	@echo "  make prod-logs  - Ver logs de producción"
+	@echo "  make status     - Ver estado de los contenedores"
+	@echo "  make help       - Mostrar esta ayuda"

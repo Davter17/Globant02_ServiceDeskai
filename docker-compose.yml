@@ -35,7 +35,7 @@ services:
       MONGODB_URI: mongodb://admin:admin123@mongodb:27017/servicedesk?authSource=admin
       JWT_SECRET: your-super-secret-jwt-key-change-in-production
       JWT_EXPIRE: 7d
-      FRONTEND_URL: http://localhost:3000
+      FRONTEND_URL: http://localhost:3001
     ports:
       - "5000:5000"
     volumes:
@@ -63,7 +63,7 @@ services:
       REACT_APP_SOCKET_URL: http://localhost:5000
       WATCHPACK_POLLING: "true"
     ports:
-      - "3000:3000"
+      - "3001:3000"
     volumes:
       - ./frontend:/app
       - /app/node_modules

@@ -318,7 +318,7 @@ const assignReport = async (req, res) => {
     }
 
     // Usar método del modelo
-    await report.assignTo(assignedTo, req.user.id);
+    await report.assignTo(assignedTo);
 
     // Populate para respuesta
     await report.populate([
@@ -424,7 +424,7 @@ const closeReport = async (req, res) => {
     report.statusHistory.push({
       status: 'closed',
       changedBy: req.user.id,
-      timestamp: new Date()
+      changedAt: new Date()
     });
 
     await report.save();

@@ -80,16 +80,16 @@ const getAllOffices = async (req, res) => {
       query.$or = [
         { name: { $regex: search, $options: 'i' } },
         { code: { $regex: search, $options: 'i' } },
-        { 'address.city': { $regex: search, $options: 'i' } }
+        { 'location.city': { $regex: search, $options: 'i' } }
       ];
     }
 
     if (city) {
-      query['address.city'] = { $regex: city, $options: 'i' };
+      query['location.city'] = { $regex: city, $options: 'i' };
     }
 
     if (country) {
-      query['address.country'] = { $regex: country, $options: 'i' };
+      query['location.country'] = { $regex: country, $options: 'i' };
     }
 
     if (isActive !== undefined) {
@@ -283,10 +283,7 @@ const getNearbyOffices = async (req, res) => {
       });
     }
 
-    const offices = await Office.find({
-      isActive: true,
-      'location.coordinates': { $exists: true }
-    }).nearbyOffices(longitude, latitude, parseInt(maxDistance));
+    const offices = await Office.findNearby(latitude, longitude, parseInt(maxDistance) / 1000);
 
     res.status(200).json({
       success: true,

@@ -221,9 +221,9 @@ const offices = [
 
 // Función para crear reportes de ejemplo
 const createSampleReports = (users, offices) => {
-  const categories = ['hardware', 'software', 'network', 'email', 'printer', 'phone', 'access', 'other'];
+  const categories = ['hardware', 'software', 'network', 'furniture', 'facilities', 'electrical', 'plumbing', 'hvac', 'security', 'cleaning', 'other'];
   const priorities = ['low', 'medium', 'high', 'critical'];
-  const statuses = ['open', 'in_progress', 'resolved', 'closed'];
+  const statuses = ['open', 'assigned', 'in-progress', 'resolved', 'closed'];
 
   const reportTemplates = [
     {
@@ -245,25 +245,19 @@ const createSampleReports = (users, offices) => {
       description: 'The entire 5th floor has no internet connectivity. Multiple users affected.'
     },
     {
-      category: 'email',
+      category: 'electrical',
       priority: 'medium',
-      title: 'Cannot send emails',
-      description: 'Outlook shows "sending" but emails never go out. Can receive emails fine.'
+      title: 'Power outlet not working',
+      description: 'The power outlet under my desk stopped working. Already tried a different device with no luck.'
     },
     {
-      category: 'printer',
+      category: 'furniture',
       priority: 'low',
-      title: 'Printer paper jam',
-      description: 'The main floor printer has a paper jam. Already tried removing visible paper.'
+      title: 'Broken chair',
+      description: 'My office chair has a broken wheel and the height adjustment does not work anymore.'
     },
     {
-      category: 'phone',
-      priority: 'medium',
-      title: 'Desk phone no dial tone',
-      description: 'My desk phone extension 4521 has no dial tone. Cannot make or receive calls.'
-    },
-    {
-      category: 'access',
+      category: 'security',
       priority: 'high',
       title: 'Badge not working',
       description: 'My security badge is not opening the main entrance door.'
@@ -279,6 +273,12 @@ const createSampleReports = (users, offices) => {
       priority: 'high',
       title: 'License activation failed',
       description: 'Adobe Creative Suite asking for license activation but code is not working.'
+    },
+    {
+      category: 'hvac',
+      priority: 'medium',
+      title: 'AC not working in conference room',
+      description: 'The air conditioning in conference room B is not cooling. Temperature keeps rising.'
     },
     {
       category: 'network',
@@ -299,7 +299,7 @@ const createSampleReports = (users, offices) => {
 
     const report = {
       ...template,
-      createdBy: randomUser._id,
+      user: randomUser._id,
       office: randomOffice._id,
       status: randomStatus,
       location: {
@@ -312,18 +312,24 @@ const createSampleReports = (users, offices) => {
     };
 
     // Si está asignado o resuelto, agregar datos adicionales
-    if (randomStatus === 'in_progress' || randomStatus === 'resolved' || randomStatus === 'closed') {
+    if (randomStatus === 'assigned' || randomStatus === 'in-progress' || randomStatus === 'resolved' || randomStatus === 'closed') {
       report.assignedTo = servicedeskUsers[0]._id;
     }
 
     if (randomStatus === 'resolved' || randomStatus === 'closed') {
-      report.resolution = 'Issue has been resolved. All systems working normally now.';
-      report.resolvedAt = new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000); // Last 7 days
+      report.resolution = {
+        description: 'Issue has been resolved. All systems working normally now.',
+        resolvedBy: servicedeskUsers[0]._id,
+        resolvedAt: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000)
+      };
     }
 
     if (randomStatus === 'closed') {
-      report.rating = Math.floor(Math.random() * 2) + 4; // 4 or 5 stars
-      report.ratingComment = 'Great service, issue resolved quickly!';
+      report.rating = {
+        score: Math.floor(Math.random() * 2) + 4,
+        comment: 'Great service, issue resolved quickly!',
+        ratedAt: new Date()
+      };
     }
 
     reports.push(report);
