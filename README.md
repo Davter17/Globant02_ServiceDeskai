@@ -9,7 +9,13 @@ Intelligent incident management platform with AI image analysis, geolocation, re
 The project ships with a Makefile that wraps Docker Compose. From the project root:
 
 ```bash
-make restart
+make setup      # first time only — creates .env files
+make up         # start in background
+make dev        # start with logs visible
+make down       # stop containers
+make re         # rebuild from scratch
+make seed       # load test data into MongoDB
+make prod       # production build (nginx on :80)
 ```
 
 Once the containers are running, open your browser and navigate to:
@@ -31,18 +37,51 @@ npm test
 
 ## 🏗️ Architecture
 
-- `backend/src/index.js` — Express entry point: security middleware, routes and Socket.io setup.
-- `backend/src/config/` — MongoDB connection, Socket.io config and Nodemailer transport.
-- `backend/src/controllers/` — business logic for auth, users, offices, reports and email.
-- `backend/src/middleware/` — JWT auth, RBAC authorization, rate limiting, validation and security.
-- `backend/src/models/` — Mongoose schemas (User, Office, Report, Message).
-- `backend/src/routes/` — REST API endpoints.
-- `backend/src/utils/jwt.js` — access/refresh token generation and verification.
-- `frontend/src/` — React 18 SPA with Redux Toolkit, React Router, Socket.io client and PWA service worker.
-- `docker-compose.yml` — dev orchestration (MongoDB + backend + frontend).
-- `docker-compose.prod.yml` — production orchestration with hardened credentials.
-- `nginx/` — reverse proxy with SSL, rate limiting and WebSocket support for production.
+```
+globant2/
+├── backend/
+│   ├── src/
+│   │   ├── config/       — MongoDB, Socket.io, Nodemailer
+│   │   ├── controllers/  — auth, users, offices, reports, email
+│   │   ├── middleware/   — JWT auth, RBAC, rate limiting, validation
+│   │   ├── models/       — Mongoose schemas (User, Office, Report, Message)
+│   │   ├── routes/       — REST API endpoints
+│   │   └── utils/        — JWT token generation/verification
+│   ├── scripts/          — MongoDB init scripts
+│   └── Dockerfile
+├── docker/
+│   ├── docker-compose.yml      — dev orchestration (MongoDB + backend + frontend)
+│   ├── docker-compose.prod.yml — production with hardened credentials
+│   ├── nginx.conf              — reverse proxy config
+│   └── conf.d/                 — nginx virtual hosts
+├── frontend/
+│   ├── src/              — React 18 SPA with Redux Toolkit
+│   ├── public/           — PWA assets and service worker
+│   └── Dockerfile
+├── scripts/              — setup scripts (SSL, etc.)
+└── Makefile              — Docker Compose wrapper
+```
 
 ## 🎮 How to use
 
 Sign in with a test account (created by `make seed`): admin@test.com / Admin123!, servicedesk@test.com / Service123! or user@test.com / User123!. Create incident reports with geolocation and image attachments, track them through the ticket dashboard, chat in real time with Socket.io, and manage users and offices from the admin panel.
+
+## 📋 Makefile commands
+
+| Command | Description |
+|---------|-------------|
+| `make setup` | Create .env files from templates |
+| `make up` | Start containers in background |
+| `make dev` | Start with logs visible |
+| `make down` | Stop containers |
+| `make build` | Build Docker images |
+| `make clean` | Remove containers |
+| `make fclean` | Remove containers, images and volumes |
+| `make re` | Rebuild from scratch (`fclean` + `up`) |
+| `make logs` | Show all container logs |
+| `make logs-backend` | Show backend logs only |
+| `make logs-frontend` | Show frontend logs only |
+| `make seed` | Load test data into MongoDB |
+| `make prod` | Build and start production (nginx on :80) |
+| `make prod-down` | Stop production containers |
+| `make prod-logs` | Show production logs |

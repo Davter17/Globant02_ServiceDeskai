@@ -1,112 +1,84 @@
-.PHONY: up down build restart logs clean help dev prod seed setup status install
+NAME = servicedesk
+COMPOSE_FILE = docker/docker-compose.yml
+COMPOSE_FILE_PROD = docker/docker-compose.prod.yml
 
-# Comando por defecto
+.PHONY: all build up down clean fclean re logs dev prod prod-down prod-logs setup install status seed
+
 all: up
 
-# Levantar el proyecto en segundo plano
-up:
-	@echo "🚀 Levantando el proyecto..."
-	@docker-compose up -d --build
-	@echo "✅ Listo!"
-	@echo "   Frontend: http://localhost:3001"
-	@echo "   Backend:  http://localhost:5000"
-
-# Levantar el proyecto con logs visibles
-dev:
-	@echo "🚀 Levantando el proyecto en modo desarrollo..."
-	@echo "   Frontend: http://localhost:3001"
-	@echo "   Backend:  http://localhost:5000"
-	@docker-compose up --build
-
-# Bajar el proyecto
-down:
-	@echo "🛑 Bajando el proyecto..."
-	@docker-compose down
-
-# Reconstruir desde cero
-build:
-	@echo "🔨 Reconstruyendo el proyecto..."
-	@docker-compose build --no-cache
-
-# Reiniciar el proyecto
-restart: down up
-	@echo "🔄 Proyecto reiniciado"
-
-# Ver logs
-logs:
-	@echo "📋 Mostrando logs..."
-	@docker-compose logs -f
-
-# Logs solo del backend
-logs-backend:
-	@docker-compose logs -f backend
-
-# Logs solo del frontend
-logs-frontend:
-	@docker-compose logs -f frontend
-
-# Limpiar contenedores, volúmenes e imágenes
-clean:
-	@echo "🧹 Limpiando contenedores, volúmenes e imágenes..."
-	@docker-compose down -v --rmi all
-
-# Cargar datos de prueba
-seed:
-	@echo "🌱 Cargando datos de prueba..."
-	@docker exec -it servicedesk-backend npm run seed
-	@echo "✅ Datos de prueba cargados"
-
-# Setup inicial
 setup:
-	@echo "📦 Configurando proyecto..."
+	@printf "  \033[33m⚙\033[0m  Setting up project...\n"
 	@cp -n backend/.env.example backend/.env 2>/dev/null || true
-	@echo "✅ Archivos .env creados"
-	@echo "⚠️  Edita los archivos .env con tus configuraciones"
-	@echo "🚀 Después ejecuta: make up"
+	@printf "  \033[32m✓\033[0m .env files created → $(NAME)\n"
+	@printf "  \033[31m⚠\033[0m  Edit .env files with your configuration\n"
 
-# Instalar dependencias
 install:
-	@echo "📦 Instalando dependencias..."
+	@printf "  \033[33m⚙\033[0m  Installing dependencies...\n"
 	@cd backend && npm install
 	@cd frontend && npm install
-	@echo "✅ Dependencias instaladas"
+	@printf "  \033[32m✓\033[0m Dependencies installed → $(NAME)\n"
 
-# Producción
-prod:
-	@echo "🚀 Construyendo y levantando producción..."
-	@docker-compose -f docker-compose.prod.yml up --build -d
-	@echo "✅ Producción lista en http://localhost:80"
+build:
+	@printf "  \033[33m⚙\033[0m  Building Docker images...\n"
+	@docker compose -f $(COMPOSE_FILE) --project-name $(NAME) build
+	@printf "  \033[32m✓\033[0m Images built → $(NAME)\n"
 
-# Bajar producción
-prod-down:
-	@echo "🛑 Bajando producción..."
-	@docker-compose -f docker-compose.prod.yml down
+up: build
+	@printf "  \033[33m⚙\033[0m  Starting containers...\n"
+	@docker compose -f $(COMPOSE_FILE) --project-name $(NAME) up -d
+	@printf "  \033[32m✓\033[0m Containers running → $(NAME)\n"
+	@printf "     Frontend: http://localhost:3001\n"
+	@printf "     Backend:  http://localhost:5000\n"
 
-# Ver logs de producción
-prod-logs:
-	@echo "📋 Mostrando logs de producción..."
-	@docker-compose -f docker-compose.prod.yml logs -f
+dev:
+	@printf "  \033[33m⚙\033[0m  Starting in development mode...\n"
+	@docker compose -f $(COMPOSE_FILE) --project-name $(NAME) up --build
 
-# Estado de los contenedores
+down:
+	@printf "  \033[33m⚙\033[0m  Stopping containers...\n"
+	@docker compose -f $(COMPOSE_FILE) --project-name $(NAME) down
+	@printf "  \033[32m✓\033[0m Containers stopped → $(NAME)\n"
+
+clean: down
+	@printf "  \033[31m✗\033[0m  Removing containers...\n"
+	@docker compose -f $(COMPOSE_FILE) --project-name $(NAME) rm -f
+	@printf "  \033[32m✓\033[0m Containers removed → $(NAME)\n"
+
+fclean: clean
+	@printf "  \033[31m✗\033[0m  Removing images and volumes...\n"
+	@docker compose -f $(COMPOSE_FILE) --project-name $(NAME) down -v --rmi local
+	@printf "  \033[32m✓\033[0m Images and volumes removed → $(NAME)\n"
+
+re: fclean all
+
+logs:
+	@docker compose -f $(COMPOSE_FILE) --project-name $(NAME) logs -f
+
+logs-backend:
+	@docker compose -f $(COMPOSE_FILE) --project-name $(NAME) logs -f backend
+
+logs-frontend:
+	@docker compose -f $(COMPOSE_FILE) --project-name $(NAME) logs -f frontend
+
 status:
-	@echo "📊 Estado de los contenedores:"
-	@docker-compose ps
+	@docker compose -f $(COMPOSE_FILE) --project-name $(NAME) ps
 
-# Ayuda
-help:
-	@echo "📖 Comandos disponibles:"
-	@echo "  make up         - Levantar el proyecto en segundo plano"
-	@echo "  make dev        - Levantar el proyecto con logs visibles"
-	@echo "  make down       - Bajar el proyecto"
-	@echo "  make build      - Reconstruir el proyecto desde cero"
-	@echo "  make restart    - Reiniciar el proyecto"
-	@echo "  make logs       - Ver logs del proyecto"
-	@echo "  make clean      - Limpiar contenedores, volúmenes e imágenes"
-	@echo "  make seed       - Cargar datos de prueba en MongoDB"
-	@echo "  make setup      - Setup inicial del proyecto"
-	@echo "  make install    - Instalar dependencias"
-	@echo "  make prod       - Build y levantar producción"
-	@echo "  make prod-down  - Bajar el contenedor de producción"
-	@echo "  make prod-logs  - Ver logs de producción"
-	@echo "  make status     - Ver estado de los contenedores"
-	@echo "  make help       - Mostrar esta ayuda"
+seed:
+	@printf "  \033[33m⚙\033[0m  Loading seed data...\n"
+	@docker exec -it servicedesk-backend npm run seed
+	@printf "  \033[32m✓\033[0m Seed data loaded → $(NAME)\n"
+
+prod:
+	@printf "  \033[33m⚙\033[0m  Building production images...\n"
+	@docker compose -f $(COMPOSE_FILE_PROD) --project-name $(NAME) build
+	@printf "  \033[33m⚙\033[0m  Starting production containers...\n"
+	@docker compose -f $(COMPOSE_FILE_PROD) --project-name $(NAME) up -d
+	@printf "  \033[32m✓\033[0m Production running → http://localhost:80\n"
+
+prod-down:
+	@printf "  \033[33m⚙\033[0m  Stopping production containers...\n"
+	@docker compose -f $(COMPOSE_FILE_PROD) --project-name $(NAME) down
+	@printf "  \033[32m✓\033[0m Production stopped → $(NAME)\n"
+
+prod-logs:
+	@docker compose -f $(COMPOSE_FILE_PROD) --project-name $(NAME) logs -f

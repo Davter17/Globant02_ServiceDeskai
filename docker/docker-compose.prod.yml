@@ -1,5 +1,4 @@
 services:
-  # MongoDB Database
   mongodb:
     image: mongo:7
     container_name: servicedesk-mongodb-prod
@@ -18,10 +17,9 @@ services:
       timeout: 5s
       retries: 5
 
-  # Backend API (Node.js + Express)
   backend:
     build:
-      context: ./backend
+      context: ../backend
       dockerfile: Dockerfile
       target: production
     container_name: servicedesk-backend-prod
@@ -36,17 +34,16 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./backend/uploads:/app/uploads
+      - ../backend/uploads:/app/uploads
     depends_on:
       mongodb:
         condition: service_healthy
     networks:
       - servicedesk-network
 
-  # Frontend (React + Nginx)
   frontend:
     build:
-      context: ./frontend
+      context: ../frontend
       dockerfile: Dockerfile
       target: production
     container_name: servicedesk-frontend-prod

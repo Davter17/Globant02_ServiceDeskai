@@ -1,5 +1,4 @@
 services:
-  # MongoDB Database
   mongodb:
     image: mongo:7
     container_name: servicedesk-mongodb
@@ -12,7 +11,7 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
-      - ./backend/scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ../backend/scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     networks:
       - servicedesk-network
     healthcheck:
@@ -21,10 +20,9 @@ services:
       timeout: 5s
       retries: 5
 
-  # Backend API (Node.js + Express)
   backend:
     build:
-      context: ./backend
+      context: ../backend
       dockerfile: Dockerfile
       target: development
     container_name: servicedesk-backend
@@ -39,9 +37,9 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./backend:/app
+      - ../backend:/app
       - /app/node_modules
-      - ./backend/uploads:/app/uploads
+      - ../backend/uploads:/app/uploads
     depends_on:
       mongodb:
         condition: service_healthy
@@ -49,10 +47,9 @@ services:
       - servicedesk-network
     command: npm run dev
 
-  # Frontend (React)
   frontend:
     build:
-      context: ./frontend
+      context: ../frontend
       dockerfile: Dockerfile
       target: development
     container_name: servicedesk-frontend
@@ -65,7 +62,7 @@ services:
     ports:
       - "3001:3000"
     volumes:
-      - ./frontend:/app
+      - ../frontend:/app
       - /app/node_modules
     depends_on:
       - backend
